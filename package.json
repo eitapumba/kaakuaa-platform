@@ -1,0 +1,26 @@
+{
+  "name": "kaakuaa-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Kaa Kuaa — Plataforma de Desafios, Regeneração e Investimento em Players",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "backend": "npm run dev --workspace=apps/backend",
+    "mobile": "npm run dev --workspace=apps/mobile",
+    "web": "npm run dev --workspace=apps/web",
+    "admin": "npm run dev --workspace=apps/admin",
+    "desktop": "npm run dev --workspace=apps/desktop",
+    "build:backend": "npm run build --workspace=apps/backend",
+    "build:web": "npm run build --workspace=apps/web",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces",
+    "db:migrate": "npm run migration:run --workspace=apps/backend",
+    "db:seed": "npm run seed --workspace=apps/backend"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

@@ -1,0 +1,13 @@
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Verification } from './verification.entity';
+import { VerificationService } from './verification.service';
+import { VerificationController } from './verification.controller';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([Verification])],
+  controllers: [VerificationController],
+  providers: [VerificationService],
+  exports: [VerificationService],
+})
+export class VerificationModule {}
