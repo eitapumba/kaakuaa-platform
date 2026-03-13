@@ -28,8 +28,10 @@ import { Investment } from './modules/investments/investment.entity';
 import { Product } from './modules/marketplace/product.entity';
 import { Order } from './modules/marketplace/order.entity';
 import { Content } from './modules/content/content.entity';
+import { HealthController } from './health.controller';
 
 @Module({
+  controllers: [HealthController],
   imports: [
     // Config
     ConfigModule.forRoot({
