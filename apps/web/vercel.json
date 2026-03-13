@@ -1,4 +1,0 @@
-{
-  "installCommand": "npm install --no-package-lock --legacy-peer-deps",
-  "framework": "nextjs"
-}

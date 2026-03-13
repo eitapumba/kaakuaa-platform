@@ -20,6 +20,9 @@
     "db:migrate": "npm run migration:run --workspace=apps/backend",
     "db:seed": "npm run seed --workspace=apps/backend"
   },
+  "devDependencies": {
+    "next": "^14.0.0"
+  },
   "engines": {
     "node": ">=20.0.0"
   }
