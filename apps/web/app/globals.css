@@ -239,3 +239,189 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(201,169,110,0.25);
   color: var(--dark);
 }
+
+/* === LANDING PAGE === */
+
+.landing-hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(ellipse 80% 60% at 50% 40%, #E9EDC9 0%, #FEFAE0 50%, #FAEDCD 100%);
+}
+
+.landing-hero::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  left: -20%;
+  width: 140%;
+  height: 140%;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(201,169,110,0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(204,213,174,0.12) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(201,169,110,0.04) 0%, transparent 70%);
+  animation: landingBg 20s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes landingBg {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-2%, 1%) scale(1.02); }
+  66% { transform: translate(1%, -1%) scale(0.98); }
+}
+
+.landing-glow {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.3;
+  animation: float 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.landing-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  line-height: 1.05;
+  text-align: center;
+  color: var(--dark);
+  letter-spacing: -0.02em;
+}
+
+.landing-subtitle {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 300;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  color: var(--text-muted);
+  text-align: center;
+  max-width: 520px;
+  line-height: 1.7;
+}
+
+.landing-section {
+  padding: 6rem 1.5rem;
+  position: relative;
+}
+
+.category-orb {
+  width: 80px;
+  height: 80px;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: default;
+}
+
+.category-orb:hover {
+  transform: translateY(-6px) scale(1.08);
+}
+
+.stat-block {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.stat-block .number {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 400;
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  color: var(--gold);
+  line-height: 1;
+}
+
+.stat-block .label {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+}
+
+.how-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+  padding: 2rem 1.5rem;
+}
+
+.how-step .step-num {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #d4b06a 0%, #c9a96e 50%, #b8944e 100%);
+  color: #fff;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(201,169,110,0.3);
+}
+
+.regen-banner {
+  background: linear-gradient(135deg, rgba(204,213,174,0.4) 0%, rgba(233,237,201,0.4) 100%);
+  border: 1px solid rgba(204,213,174,0.3);
+  border-radius: 1.5rem;
+  padding: 3rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.regen-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 120%, rgba(204,213,174,0.3) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.landing-footer {
+  padding: 3rem 1.5rem;
+  text-align: center;
+  border-top: 1px solid rgba(201,169,110,0.12);
+}
+
+/* stagger animations */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+.stagger-5 { animation-delay: 0.5s; }
+.stagger-6 { animation-delay: 0.6s; }
+
+@keyframes revealUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.reveal-up {
+  opacity: 0;
+  animation: revealUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes drawLine {
+  from { width: 0; }
+  to { width: 60px; }
+}
+
+.draw-line {
+  height: 1px;
+  background: var(--gold);
+  animation: drawLine 1s ease forwards;
+  animation-delay: 0.5s;
+  width: 0;
+}

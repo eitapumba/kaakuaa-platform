@@ -8,6 +8,249 @@ import { useAuth } from '../lib/auth-context'
 import { useSocket } from '../lib/use-socket'
 import { api } from '../lib/api'
 
+/* ═══════════════════════════════════════
+   LANDING PAGE — for visitors
+   ═══════════════════════════════════════ */
+
+const LANDING_CATEGORIES = [
+  { emoji: '🏋️', label: 'Sports', bg: 'bg-beige' },
+  { emoji: '🎮', label: 'E-Sports', bg: 'bg-sage-light' },
+  { emoji: '🧠', label: 'Evolução', bg: 'bg-beige' },
+  { emoji: '🌿', label: 'Regeneração', bg: 'bg-sage-light' },
+  { emoji: '🎤', label: 'Rap Battle', bg: 'bg-beige' },
+  { emoji: '🍳', label: 'Culinária', bg: 'bg-sage-light' },
+]
+
+function LandingPage() {
+  const [scrollY, setScrollY] = useState(0)
+
+  useEffect(() => {
+    const onScroll = () => setScrollY(window.scrollY)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  return (
+    <div className="min-h-screen">
+      {/* ── Minimal Nav ── */}
+      <nav className="nav-glass fixed top-0 left-0 right-0 z-50">
+        <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
+          <Link href="/" className="flex items-center gap-3">
+            <Image src="/img/logo-nav.png" alt="Jungle Games" width={120} height={36} className="h-8 w-auto" />
+          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/auth" className="text-sm font-light tracking-wide text-kk-text-muted hover:text-gold transition-colors">
+              Entrar
+            </Link>
+            <Link href="/auth" className="btn-gold text-xs py-2.5 px-6">
+              Criar Conta
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* ═══ HERO ═══ */}
+      <section className="landing-hero">
+        {/* Decorative glows */}
+        <div className="landing-glow" style={{ top: '15%', left: '10%', background: 'rgba(204,213,174,0.5)' }} />
+        <div className="landing-glow" style={{ bottom: '20%', right: '10%', background: 'rgba(201,169,110,0.3)', animationDelay: '3s' }} />
+
+        <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
+          {/* Badge */}
+          <div className="reveal-up inline-flex items-center gap-2 mb-8 px-5 py-2 rounded-full border border-gold-muted bg-white/40 backdrop-blur-sm">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            <span className="text-xs tracking-widest uppercase text-kk-text-muted font-light">
+              Jogadores online agora
+            </span>
+          </div>
+
+          {/* Title */}
+          <h1 className="landing-title reveal-up stagger-1">
+            Desafie. Jogue.<br />
+            <span className="bg-gold-gradient bg-clip-text text-transparent">Regenere o Planeta.</span>
+          </h1>
+
+          {/* Subtitle */}
+          <p className="landing-subtitle mx-auto mt-6 reveal-up stagger-2">
+            Uma arena de desafios ao vivo onde cada partida financia projetos de regeneração ambiental.
+            Aposte nas suas habilidades e faça a diferença.
+          </p>
+
+          {/* CTA */}
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 reveal-up stagger-3">
+            <Link href="/auth" className="btn-gold text-sm py-4 px-10">
+              Comece a Jogar
+            </Link>
+            <a href="#como-funciona" className="btn-outline text-sm py-3.5 px-8">
+              Como Funciona
+            </a>
+          </div>
+
+          {/* Category icons floating row */}
+          <div className="mt-16 flex items-center justify-center gap-4 flex-wrap reveal-up stagger-4">
+            {LANDING_CATEGORIES.map((cat, i) => (
+              <div
+                key={cat.label}
+                className={`category-orb ${cat.bg} shadow-card`}
+                style={{ animationDelay: `${i * 0.15}s` }}
+                title={cat.label}
+              >
+                {cat.emoji}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50">
+          <span className="text-[10px] tracking-[0.3em] uppercase text-kk-text-muted">Scroll</span>
+          <div className="w-px h-8 bg-gold/40 animate-pulse" />
+        </div>
+      </section>
+
+      {/* ═══ STATS BAR ═══ */}
+      <section className="py-8 border-b border-gold-muted bg-white/30 backdrop-blur-sm">
+        <div className="max-w-4xl mx-auto grid grid-cols-3 gap-4">
+          <div className="stat-block">
+            <p className="number">6</p>
+            <p className="label">Categorias</p>
+          </div>
+          <div className="stat-block">
+            <p className="number">30%</p>
+            <p className="label">Para o Planeta</p>
+          </div>
+          <div className="stat-block">
+            <p className="number">24/7</p>
+            <p className="label">Ao Vivo</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ WHAT IS ═══ */}
+      <section className="landing-section bg-ivory">
+        <div className="max-w-4xl mx-auto text-center">
+          <p className="sec-label mb-4">O que é Jungle Games</p>
+          <div className="draw-line mx-auto mb-8" />
+          <h2 className="font-serif text-heading mb-6">
+            A arena onde suas habilidades<br />
+            <span className="text-gold">valem de verdade</span>
+          </h2>
+          <p className="landing-subtitle mx-auto">
+            Escolha um desafio, defina sua aposta e enfrente oponentes ao vivo.
+            Ganhe dinheiro real e VITA tokens — enquanto cada partida
+            destina 30% para projetos de regeneração ambiental.
+          </p>
+        </div>
+      </section>
+
+      {/* ═══ CATEGORIES ═══ */}
+      <section className="landing-section" style={{ background: 'linear-gradient(180deg, #FEFAE0 0%, #FAEDCD 100%)' }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="sec-label mb-4">Categorias</p>
+            <h2 className="font-serif text-heading">Escolha seu campo de batalha</h2>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
+            {[
+              { emoji: '🏋️', label: 'Sports', desc: 'Desafios físicos transmitidos ao vivo' },
+              { emoji: '🎮', label: 'E-Sports', desc: 'Duelos em games competitivos' },
+              { emoji: '🧠', label: 'Evolução', desc: 'Desafios de crescimento pessoal' },
+              { emoji: '🌿', label: 'Regeneração', desc: 'Missões de impacto ambiental' },
+              { emoji: '🎤', label: 'Rap Battle', desc: 'Batalhas de rima e improviso' },
+              { emoji: '🍳', label: 'Culinária', desc: 'Duelos gastronômicos ao vivo' },
+            ].map((cat, i) => (
+              <div
+                key={cat.label}
+                className="premium-card p-6 text-center"
+              >
+                <div className="w-16 h-16 rounded-2xl bg-sage-light flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">{cat.emoji}</span>
+                </div>
+                <h3 className="font-serif text-xl mb-1">{cat.label}</h3>
+                <p className="text-xs text-kk-text-muted font-light">{cat.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ HOW IT WORKS ═══ */}
+      <section id="como-funciona" className="landing-section bg-ivory">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-14">
+            <p className="sec-label mb-4">Como Funciona</p>
+            <div className="draw-line mx-auto mb-8" />
+            <h2 className="font-serif text-heading">Simples. Rápido. Real.</h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { num: '1', title: 'Escolha o Desafio', desc: 'Selecione a categoria e defina seu stake. De R$20 a R$2.000.' },
+              { num: '2', title: 'Enfrente ao Vivo', desc: 'Matchmaking instantâneo. Câmera liga e o desafio começa.' },
+              { num: '3', title: 'Ganhe e Regenere', desc: 'Vencedor leva 59.5%. 30% vai para projetos ambientais.' },
+            ].map(step => (
+              <div key={step.num} className="how-step glass-card rounded-3xl">
+                <div className="step-num">{step.num}</div>
+                <h3 className="font-serif text-xl">{step.title}</h3>
+                <p className="text-sm text-kk-text-muted font-light leading-relaxed">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ REGENERATION ═══ */}
+      <section className="landing-section" style={{ background: 'linear-gradient(180deg, #FEFAE0 0%, #E9EDC9 100%)' }}>
+        <div className="max-w-3xl mx-auto">
+          <div className="regen-banner">
+            <div className="relative z-10">
+              <span className="text-5xl block mb-4">🌱</span>
+              <h2 className="font-serif text-heading mb-4">
+                Cada desafio regenera o planeta
+              </h2>
+              <p className="landing-subtitle mx-auto mb-2">
+                30% de cada pool é destinado a projetos reais — eco-vilas,
+                reflorestamento e acesso à água limpa.
+                Jogue e faça parte da mudança.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ FINAL CTA ═══ */}
+      <section className="landing-section bg-ivory">
+        <div className="max-w-2xl mx-auto text-center">
+          <p className="sec-label mb-4">Pronto?</p>
+          <h2 className="landing-title mb-6" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}>
+            Entre na arena
+          </h2>
+          <p className="landing-subtitle mx-auto mb-10">
+            Crie sua conta em 30 segundos, ganhe 100 VITA de boas-vindas
+            e comece a desafiar agora.
+          </p>
+          <Link href="/auth" className="btn-gold text-sm py-4 px-12">
+            Criar Minha Conta
+          </Link>
+        </div>
+      </section>
+
+      {/* ═══ FOOTER ═══ */}
+      <footer className="landing-footer">
+        <Image src="/img/logo-nav.png" alt="Jungle Games" width={100} height={30} className="h-6 w-auto mx-auto mb-3 opacity-40" />
+        <p className="text-xs text-kk-text-muted font-light">
+          Jungle Games — Desafie-se. Regenere o Planeta.
+        </p>
+      </footer>
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════
+   DASHBOARD — for logged-in users
+   ═══════════════════════════════════════ */
+
 const CATEGORIES = [
   { key: 'sports', emoji: '🏋️', label: 'Sports', desc: 'Desafios físicos ao vivo', online: 47 },
   { key: 'esports', emoji: '🎮', label: 'E-Sports', desc: 'Games competitivos', online: 124 },
@@ -155,7 +398,6 @@ export default function HomePage() {
     setApiLoading(true)
 
     try {
-      // Chamada real ao backend
       const result = await api.joinMatchmaking({
         category: selectedCat,
         stakeAmount: selectedStake,
@@ -163,13 +405,10 @@ export default function HomePage() {
       })
 
       if (result.status === 'matched') {
-        // Match imediato — o WebSocket vai notificar
         setPhase('match')
       }
-      // Se 'searching', o WebSocket vai notificar quando achar match
     } catch (err) {
       console.error('Erro ao entrar na fila:', err)
-      // Fallback: simular match (quando backend não está rodando)
       setTimeout(() => {
         setPhase('match')
         let c = 5
@@ -218,6 +457,13 @@ export default function HomePage() {
     )
   }
 
+  // ════════════════════════════════════
+  // NOT LOGGED IN → SHOW LANDING PAGE
+  // ════════════════════════════════════
+  if (!user) {
+    return <LandingPage />
+  }
+
   // Opponent info (from WebSocket or mock)
   const opponent = matchData?.opponent || {
     displayName: 'Oponente',
@@ -252,55 +498,37 @@ export default function HomePage() {
                   <span className="bg-gold-gradient bg-clip-text text-transparent">Regenere o Planeta.</span>
                 </h1>
               </div>
-              {user && (
-                <div className="hidden md:flex items-center gap-5">
-                  <div className="text-right">
-                    <p className="stat-num">{vitaBalance.toLocaleString()}</p>
-                    <p className="text-xs text-kk-text-muted mt-1">VITA</p>
-                  </div>
-                  <div className="w-px h-10 bg-gold-muted" />
-                  <div className="text-right">
-                    <p className="stat-num">{wins}-{losses}</p>
-                    <p className="text-xs text-kk-text-muted mt-1">W-L</p>
-                  </div>
-                  <div className="w-px h-10 bg-gold-muted" />
-                  <div className="text-right">
-                    <p className="stat-num">R${totalEarnings}</p>
-                    <p className="text-xs text-kk-text-muted mt-1">Ganhos</p>
-                  </div>
+              <div className="hidden md:flex items-center gap-5">
+                <div className="text-right">
+                  <p className="stat-num">{vitaBalance.toLocaleString()}</p>
+                  <p className="text-xs text-kk-text-muted mt-1">VITA</p>
                 </div>
-              )}
+                <div className="w-px h-10 bg-gold-muted" />
+                <div className="text-right">
+                  <p className="stat-num">{wins}-{losses}</p>
+                  <p className="text-xs text-kk-text-muted mt-1">W-L</p>
+                </div>
+                <div className="w-px h-10 bg-gold-muted" />
+                <div className="text-right">
+                  <p className="stat-num">R${totalEarnings}</p>
+                  <p className="text-xs text-kk-text-muted mt-1">Ganhos</p>
+                </div>
+              </div>
             </div>
 
             {/* Mobile stats */}
-            {user && (
-              <div className="grid grid-cols-3 gap-3 mb-10 md:hidden">
-                {[
-                  { val: vitaBalance.toLocaleString(), label: 'VITA' },
-                  { val: `${wins}-${losses}`, label: 'W-L' },
-                  { val: `R$${totalEarnings}`, label: 'Ganhos' },
-                ].map(s => (
-                  <div key={s.label} className="glass-card rounded-2xl p-4 text-center">
-                    <p className="stat-num text-xl">{s.val}</p>
-                    <p className="text-xs text-kk-text-muted mt-1">{s.label}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Not logged in banner */}
-            {!user && (
-              <div className="glass-card rounded-3xl p-8 mb-10 flex items-center gap-6">
-                <div className="w-16 h-16 rounded-2xl bg-gold-gradient flex items-center justify-center text-3xl flex-shrink-0">
-                  ⚡
+            <div className="grid grid-cols-3 gap-3 mb-10 md:hidden">
+              {[
+                { val: vitaBalance.toLocaleString(), label: 'VITA' },
+                { val: `${wins}-${losses}`, label: 'W-L' },
+                { val: `R$${totalEarnings}`, label: 'Ganhos' },
+              ].map(s => (
+                <div key={s.label} className="glass-card rounded-2xl p-4 text-center">
+                  <p className="stat-num text-xl">{s.val}</p>
+                  <p className="text-xs text-kk-text-muted mt-1">{s.label}</p>
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-serif text-lg">Entre para começar a desafiar</h3>
-                  <p className="text-sm text-kk-text-muted mt-1">Crie sua conta em 30 segundos e ganhe 100 VITA de boas-vindas.</p>
-                </div>
-                <Link href="/auth" className="btn-gold flex-shrink-0">Criar Conta</Link>
-              </div>
-            )}
+              ))}
+            </div>
 
             {/* Section label */}
             <div className="flex items-center gap-4 mb-6">
@@ -348,7 +576,7 @@ export default function HomePage() {
                   30% de cada pool vai para projetos de regeneração ambiental — eco-vilas, reflorestamento e água limpa.
                 </p>
               </div>
-              <p className="stat-num hidden md:block flex-shrink-0">R${user?.totalEarnings ? Math.floor(user.totalEarnings * 0.3) : 0}</p>
+              <p className="stat-num hidden md:block flex-shrink-0">R${Math.floor(totalEarnings * 0.3)}</p>
             </div>
           </div>
         </section>
@@ -574,7 +802,6 @@ export default function HomePage() {
           <div className="flex justify-center gap-4 mt-8">
             <button
               onClick={() => {
-                // Toggle camera
                 const tracks = localStreamRef.current?.getVideoTracks()
                 if (tracks?.[0]) tracks[0].enabled = !tracks[0].enabled
               }}
@@ -582,7 +809,6 @@ export default function HomePage() {
             >📷</button>
             <button
               onClick={() => {
-                // Toggle mic
                 const tracks = localStreamRef.current?.getAudioTracks()
                 if (tracks?.[0]) tracks[0].enabled = !tracks[0].enabled
               }}
