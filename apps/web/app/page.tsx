@@ -16,7 +16,7 @@ const LANDING_CATEGORIES = [
   { emoji: '🏋️', label: 'Sports', bg: 'bg-beige' },
   { emoji: '🎮', label: 'E-Sports', bg: 'bg-sage-light' },
   { emoji: '🧠', label: 'Evolução', bg: 'bg-beige' },
-  { emoji: '🌿', label: 'Regeneração', bg: 'bg-sage-light' },
+  { emoji: '🎨', label: 'Artes', bg: 'bg-sage-light' },
   { emoji: '🎤', label: 'Rap Battle', bg: 'bg-beige' },
   { emoji: '🍳', label: 'Culinária', bg: 'bg-sage-light' },
 ]
@@ -60,20 +60,20 @@ function LandingPage() {
           <div className="reveal-up inline-flex items-center gap-2 mb-8 px-5 py-2 rounded-full border border-gold-muted bg-white/40 backdrop-blur-sm">
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
             <span className="text-xs tracking-widest uppercase text-kk-text-muted font-light">
-              Jogadores online agora
+              Live Reality Games
             </span>
           </div>
 
           {/* Title */}
           <h1 className="landing-title reveal-up stagger-1">
-            Desafie. Jogue.<br />
-            <span className="bg-gold-gradient bg-clip-text text-transparent">Regenere o Planeta.</span>
+            Ganhe dinheiro<br />
+            <span className="bg-gold-gradient bg-clip-text text-transparent">fazendo o que ama.</span>
           </h1>
 
           {/* Subtitle */}
           <p className="landing-subtitle mx-auto mt-6 reveal-up stagger-2">
-            Uma arena de desafios ao vivo onde cada partida financia projetos de regeneração ambiental.
-            Aposte nas suas habilidades e faça a diferença.
+            Desafios online ao vivo de esporte, artes, culinária e evolução pessoal.
+            Se divirta, evolua e ganhe dinheiro real — o caminho natural para o mundo que você merece.
           </p>
 
           {/* CTA */}
@@ -112,12 +112,12 @@ function LandingPage() {
       <section className="py-8 border-b border-gold-muted bg-white/30 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto grid grid-cols-3 gap-4">
           <div className="stat-block">
-            <p className="number">6</p>
-            <p className="label">Categorias</p>
+            <p className="number">70%</p>
+            <p className="label">Pro Vencedor</p>
           </div>
           <div className="stat-block">
             <p className="number">30%</p>
-            <p className="label">Para o Planeta</p>
+            <p className="label">Pro Planeta</p>
           </div>
           <div className="stat-block">
             <p className="number">24/7</p>
@@ -129,16 +129,17 @@ function LandingPage() {
       {/* ═══ WHAT IS ═══ */}
       <section className="landing-section bg-ivory">
         <div className="max-w-4xl mx-auto text-center">
-          <p className="sec-label mb-4">O que é Jungle Games</p>
+          <p className="sec-label mb-4">Live Reality Games</p>
           <div className="draw-line mx-auto mb-8" />
           <h2 className="font-serif text-heading mb-6">
-            A arena onde suas habilidades<br />
-            <span className="text-gold">valem de verdade</span>
+            Ganhe dinheiro<br />
+            <span className="text-gold">enquanto evolui</span>
           </h2>
           <p className="landing-subtitle mx-auto">
-            Escolha um desafio, defina sua aposta e enfrente oponentes ao vivo.
-            Ganhe dinheiro real e VITA tokens — enquanto cada partida
-            destina 30% para projetos de regeneração ambiental.
+            Desafios reais, transmitidos ao vivo. Escolha sua arena —
+            esporte, artes, culinária ou evolução pessoal — e enfrente oponentes de verdade.
+            Quem vence leva 70% do montante. E quem perde ainda sai ganhando:
+            30% vai para regenerar o planeta.
           </p>
         </div>
       </section>
@@ -153,10 +154,10 @@ function LandingPage() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
             {[
-              { emoji: '🏋️', label: 'Sports', desc: 'Desafios físicos transmitidos ao vivo' },
-              { emoji: '🎮', label: 'E-Sports', desc: 'Duelos em games competitivos' },
-              { emoji: '🧠', label: 'Evolução', desc: 'Desafios de crescimento pessoal' },
-              { emoji: '🌿', label: 'Regeneração', desc: 'Missões de impacto ambiental' },
+              { emoji: '🏋️', label: 'Sports', desc: 'Desafios físicos ao vivo' },
+              { emoji: '🎮', label: 'E-Sports', desc: 'Games competitivos em tempo real' },
+              { emoji: '🧠', label: 'Evolução Pessoal', desc: 'Cresça enquanto compete' },
+              { emoji: '🎨', label: 'Artes', desc: 'Criatividade em desafio ao vivo' },
               { emoji: '🎤', label: 'Rap Battle', desc: 'Batalhas de rima e improviso' },
               { emoji: '🍳', label: 'Culinária', desc: 'Duelos gastronômicos ao vivo' },
             ].map((cat, i) => (
@@ -186,9 +187,9 @@ function LandingPage() {
 
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { num: '1', title: 'Escolha o Desafio', desc: 'Selecione a categoria e defina seu stake. De R$20 a R$2.000.' },
-              { num: '2', title: 'Enfrente ao Vivo', desc: 'Matchmaking instantâneo. Câmera liga e o desafio começa.' },
-              { num: '3', title: 'Ganhe e Regenere', desc: 'Vencedor leva 59.5%. 30% vai para projetos ambientais.' },
+              { num: '1', title: 'Escolha o Desafio', desc: 'Esporte, artes, culinária, evolução pessoal. Defina seu stake de R$20 a R$2.000.' },
+              { num: '2', title: 'Enfrente ao Vivo', desc: 'Matchmaking instantâneo. Câmera liga e o desafio começa em tempo real.' },
+              { num: '3', title: 'Ganhe e Regenere', desc: 'Vencedor leva 70%. 30% regenera o planeta. Todo mundo ganha.' },
             ].map(step => (
               <div key={step.num} className="how-step glass-card rounded-3xl">
                 <div className="step-num">{step.num}</div>
@@ -207,12 +208,13 @@ function LandingPage() {
             <div className="relative z-10">
               <span className="text-5xl block mb-4">🌱</span>
               <h2 className="font-serif text-heading mb-4">
-                Cada desafio regenera o planeta
+                Perdeu? O planeta ganhou.
               </h2>
               <p className="landing-subtitle mx-auto mb-2">
-                30% de cada pool é destinado a projetos reais — eco-vilas,
-                reflorestamento e acesso à água limpa.
-                Jogue e faça parte da mudança.
+                Quem perde o desafio ainda sai satisfeito —
+                30% do montante vai direto para projetos reais de regeneração:
+                eco-vilas, reflorestamento e acesso à água limpa.
+                Aqui ninguém perde de verdade.
               </p>
             </div>
           </div>
@@ -224,11 +226,12 @@ function LandingPage() {
         <div className="max-w-2xl mx-auto text-center">
           <p className="sec-label mb-4">Pronto?</p>
           <h2 className="landing-title mb-6" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}>
-            Entre na arena
+            Se divirta fazendo dinheiro<br />
+            <span className="bg-gold-gradient bg-clip-text text-transparent">com o que ama</span>
           </h2>
           <p className="landing-subtitle mx-auto mb-10">
             Crie sua conta em 30 segundos, ganhe 100 VITA de boas-vindas
-            e comece a desafiar agora.
+            e entre na arena agora.
           </p>
           <Link href="/auth" className="btn-gold text-sm py-4 px-12">
             Criar Minha Conta
@@ -240,7 +243,7 @@ function LandingPage() {
       <footer className="landing-footer">
         <Image src="/img/logo-nav.png" alt="Jungle Games" width={100} height={30} className="h-6 w-auto mx-auto mb-3 opacity-40" />
         <p className="text-xs text-kk-text-muted font-light">
-          Jungle Games — Desafie-se. Regenere o Planeta.
+          Jungle Games — Live Reality Games. Ganhe dinheiro fazendo o que ama.
         </p>
       </footer>
     </div>
@@ -328,7 +331,7 @@ export default function HomePage() {
 
   const catInfo = CATEGORIES.find(c => c.key === selectedCat)
   const pool = selectedStake * 2
-  const winnerReceives = (pool * 0.595).toFixed(2)
+  const winnerReceives = (pool * 0.70).toFixed(2)
   const fundAmount = (pool * 0.30).toFixed(2)
 
   // ─── React to WebSocket events ───
@@ -654,7 +657,7 @@ export default function HomePage() {
                 </div>
                 <div className="divider" />
                 <div className="flex justify-between text-sm">
-                  <span className="text-kk-text-muted">Você recebe (59.5%)</span>
+                  <span className="text-kk-text-muted">Você recebe (70%)</span>
                   <span className="text-gold font-medium">R$ {winnerReceives}</span>
                 </div>
                 <div className="flex justify-between text-sm">
