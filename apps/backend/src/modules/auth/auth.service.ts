@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, ForbiddenException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
@@ -20,6 +20,17 @@ export interface LoginDto {
   password: string;
 }
 
+// ============================================
+// MAINTENANCE MODE — Registration Control
+// Only emails in this list can create accounts
+// Empty list = nobody can register
+// ============================================
+const REGISTRATION_ENABLED = false;
+const ALLOWED_REGISTRATION_EMAILS: string[] = [
+  'eitapumba@gmail.com',
+  // Add more allowed emails here
+];
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -28,6 +39,11 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthTokens> {
+    // Block registration if not enabled or email not in allowed list
+    if (!REGISTRATION_ENABLED && !ALLOWED_REGISTRATION_EMAILS.includes(dto.email.toLowerCase())) {
+      throw new ForbiddenException('Registros estão temporariamente desativados. Estamos em manutenção.');
+    }
+
     const existing = await this.usersService.findByEmail(dto.email);
     if (existing) {
       throw new ConflictException('Email já cadastrado');
@@ -64,6 +80,10 @@ export class AuthService {
       if (user) {
         await this.usersService.update(user.id, { googleId });
       } else {
+        // Block new Google registrations if not enabled
+        if (!REGISTRATION_ENABLED && !ALLOWED_REGISTRATION_EMAILS.includes(email.toLowerCase())) {
+          throw new ForbiddenException('Registros estão temporariamente desativados. Estamos em manutenção.');
+        }
         user = await this.usersService.create({ email, displayName, googleId });
       }
     }
