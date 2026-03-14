@@ -8,18 +8,17 @@ import type { NextRequest } from 'next/server'
 // ============================================
 const MAINTENANCE_MODE = true
 
-// Emails/IDs that can bypass maintenance (for future use with auth cookies)
-// For now, ALL visitors see the maintenance page
-const ALLOWED_EMAILS: string[] = [
-  // 'eitapumba@gmail.com',
-]
+// Secret key to bypass maintenance
+// Visit: junglegames.ai?bypass=pumba2026
+const BYPASS_SECRET = 'pumba2026'
+const BYPASS_COOKIE = 'kk_bypass'
 
 export function middleware(request: NextRequest) {
   if (!MAINTENANCE_MODE) {
     return NextResponse.next()
   }
 
-  const { pathname } = request.nextUrl
+  const { pathname, searchParams } = request.nextUrl
 
   // Allow static assets, images, fonts, etc
   if (
@@ -38,6 +37,26 @@ export function middleware(request: NextRequest) {
 
   // Allow the maintenance page itself
   if (pathname === '/maintenance') {
+    return NextResponse.next()
+  }
+
+  // Check if bypass param is in URL → set cookie and let through
+  const bypassParam = searchParams.get('bypass')
+  if (bypassParam === BYPASS_SECRET) {
+    const response = NextResponse.next()
+    response.cookies.set(BYPASS_COOKIE, 'true', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 90, // 90 days
+      path: '/',
+    })
+    return response
+  }
+
+  // Check if bypass cookie exists → let through
+  const bypassCookie = request.cookies.get(BYPASS_COOKIE)
+  if (bypassCookie?.value === 'true') {
     return NextResponse.next()
   }
 
