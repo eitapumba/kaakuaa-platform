@@ -19,6 +19,8 @@ async function bootstrap() {
     'http://localhost:19006',
     'capacitor://localhost',
     'tauri://localhost',
+    'https://junglegames.ai',
+    'https://www.junglegames.ai',
   ];
   // Adicionar URL de produção se configurada
   const prodOrigin = process.env.FRONTEND_URL;

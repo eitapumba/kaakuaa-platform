@@ -8,7 +8,7 @@ import { Logger } from '@nestjs/common';
 
 @WebSocketGateway({
   cors: {
-    origin: ['http://localhost:3000', 'http://localhost:19006', 'capacitor://localhost', 'tauri://localhost'],
+    origin: ['http://localhost:3000', 'http://localhost:19006', 'capacitor://localhost', 'tauri://localhost', 'https://junglegames.ai', 'https://www.junglegames.ai'],
   },
   namespace: '/challenges',
 })
