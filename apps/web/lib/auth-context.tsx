@@ -22,6 +22,7 @@ interface AuthContextType {
   error: string | null
   login: (email: string, password: string) => Promise<void>
   register: (email: string, password: string, displayName: string) => Promise<void>
+  loginWithGoogle: (googleId: string, email: string, displayName: string) => Promise<void>
   logout: () => void
   refreshUser: () => Promise<void>
 }
@@ -87,6 +88,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const loginWithGoogle = async (googleId: string, email: string, displayName: string) => {
+    setError(null)
+    setLoading(true)
+    try {
+      const { accessToken, refreshToken } = await api.googleAuth({ googleId, email, displayName })
+      localStorage.setItem('accessToken', accessToken)
+      localStorage.setItem('refreshToken', refreshToken)
+      await refreshUser()
+    } catch (err: any) {
+      setError(err.message || 'Erro ao entrar com Google')
+      setLoading(false)
+      throw err
+    }
+  }
+
   const logout = () => {
     localStorage.removeItem('accessToken')
     localStorage.removeItem('refreshToken')
@@ -94,7 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, register, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user, loading, error, login, register, loginWithGoogle, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   )

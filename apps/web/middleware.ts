@@ -20,9 +20,10 @@ export function middleware(request: NextRequest) {
 
   const { pathname, searchParams } = request.nextUrl
 
-  // Allow static assets, images, fonts, etc
+  // Allow static assets, images, fonts, API routes, etc
   if (
     pathname.startsWith('/_next') ||
+    pathname.startsWith('/api') ||
     pathname.startsWith('/img') ||
     pathname.startsWith('/favicon') ||
     pathname.endsWith('.ico') ||
@@ -30,7 +31,10 @@ export function middleware(request: NextRequest) {
     pathname.endsWith('.jpg') ||
     pathname.endsWith('.svg') ||
     pathname.endsWith('.css') ||
-    pathname.endsWith('.js')
+    pathname.endsWith('.js') ||
+    pathname.endsWith('.json') ||
+    pathname.endsWith('.woff2') ||
+    pathname.endsWith('.woff')
   ) {
     return NextResponse.next()
   }

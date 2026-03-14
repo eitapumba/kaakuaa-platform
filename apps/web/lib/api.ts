@@ -30,6 +30,9 @@ export const api = {
   register: (data: { email: string; password: string; displayName: string }) =>
     fetchAPI('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
 
+  googleAuth: (data: { googleId: string; email: string; displayName: string }) =>
+    fetchAPI('/auth/google', { method: 'POST', body: JSON.stringify(data) }),
+
   refreshToken: (refreshToken: string) =>
     fetchAPI('/auth/refresh', { method: 'POST', body: JSON.stringify({ refreshToken }) }),
 
