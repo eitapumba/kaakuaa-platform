@@ -19,6 +19,7 @@ const LANDING_CATEGORIES = [
   { emoji: '🎨', label: 'Artes', bg: 'bg-sage-light' },
   { emoji: '🎤', label: 'Rap Battle', bg: 'bg-beige' },
   { emoji: '🍳', label: 'Culinária', bg: 'bg-sage-light' },
+  { emoji: '🎬', label: 'Jornada do Herói', bg: 'bg-beige' },
 ]
 
 function LandingPage() {
@@ -160,6 +161,7 @@ function LandingPage() {
               { emoji: '🎨', label: 'Artes', desc: 'Criatividade em desafio ao vivo' },
               { emoji: '🎤', label: 'Rap Battle', desc: 'Batalhas de rima e improviso' },
               { emoji: '🍳', label: 'Culinária', desc: 'Duelos gastronômicos ao vivo' },
+              { emoji: '🎬', label: 'Jornada do Herói', desc: 'Do roteiro ao curta-metragem' },
             ].map((cat, i) => (
               <div
                 key={cat.label}
@@ -284,6 +286,7 @@ function Nav({ user, onLogout }: { user: any; onLogout: () => void }) {
         <div className="flex items-center gap-6">
           {[
             { href: '/challenges', label: 'Desafios' },
+            { href: '/jornada', label: 'Jornada' },
             { href: '/tv', label: 'Ao Vivo' },
             { href: '/invest', label: 'Investir' },
             { href: '/marketplace', label: 'Loja' },

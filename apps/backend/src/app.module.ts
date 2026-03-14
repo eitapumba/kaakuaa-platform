@@ -16,6 +16,7 @@ import { VerificationModule } from './modules/verification/verification.module';
 import { InvestmentsModule } from './modules/investments/investments.module';
 import { MarketplaceModule } from './modules/marketplace/marketplace.module';
 import { ContentModule } from './modules/content/content.module';
+import { JourneyModule } from './modules/journey/journey.module';
 
 // Entities
 import { User } from './modules/users/user.entity';
@@ -28,6 +29,9 @@ import { Investment } from './modules/investments/investment.entity';
 import { Product } from './modules/marketplace/product.entity';
 import { Order } from './modules/marketplace/order.entity';
 import { Content } from './modules/content/content.entity';
+import { Journey } from './modules/journey/journey.entity';
+import { JourneyStage } from './modules/journey/journey-stage.entity';
+import { JourneyVote } from './modules/journey/journey-vote.entity';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -51,6 +55,7 @@ import { HealthController } from './health.controller';
             User, Challenge, ChallengeParticipant,
             VitaTransaction, Payment, Verification,
             Investment, Product, Order, Content,
+            Journey, JourneyStage, JourneyVote,
           ],
           synchronize: true, // Para MVP — em produção usar migrations
           logging: config.get('app.nodeEnv') === 'development',
@@ -91,6 +96,7 @@ import { HealthController } from './health.controller';
     InvestmentsModule,
     MarketplaceModule,
     ContentModule,
+    JourneyModule,
   ],
 })
 export class AppModule {}

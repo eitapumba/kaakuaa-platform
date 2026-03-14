@@ -68,6 +68,7 @@ export enum VerificationMethod {
   WEARABLE = 'wearable',             // Dados de wearable (Apple Health, Garmin)
   SOCIAL_VALIDATION = 'social_validation', // Validação por pares
   SATELLITE = 'satellite',           // NDVI + IoT (regeneração)
+  PUBLIC_VOTING = 'public_voting',   // Votação pública (Jornada do Herói)
 }
 
 export enum VerificationStatus {
@@ -144,6 +145,127 @@ export enum OrderStatus {
   CANCELLED = 'cancelled',
   REFUNDED = 'refunded',
 }
+
+// --- Jornada do Herói (Hero's Journey) ---
+export enum JourneyStatus {
+  RECRUITING = 'recruiting',       // Buscando participantes para próximo estágio
+  STAGE_ACTIVE = 'stage_active',   // Estágio atual em andamento
+  VOTING = 'voting',               // Votação pública no estágio atual
+  BETWEEN_STAGES = 'between_stages', // Transição entre estágios
+  COMPLETED = 'completed',         // Todos os estágios finalizados — curta-metragem pronto
+  CANCELLED = 'cancelled',
+}
+
+export enum JourneyStageType {
+  SCREENPLAY = 'screenplay',           // Batalha de Roteiro
+  STORYBOARD = 'storyboard',           // Batalha de Storyboard
+  CINEMATOGRAPHY = 'cinematography',   // Batalha de Direção de Fotografia
+  SOUNDTRACK = 'soundtrack',           // Batalha de Trilha Sonora
+  ACTING = 'acting',                   // Batalha de Atuação
+}
+
+export enum JourneyStageStatus {
+  PENDING = 'pending',             // Aguardando estágio anterior
+  OPEN = 'open',                   // Aceitando participantes
+  ACTIVE = 'active',               // Desafio em andamento
+  VOTING = 'voting',               // Período de votação pública
+  COMPLETED = 'completed',         // Vencedor decidido
+  CANCELLED = 'cancelled',
+}
+
+export enum SubmissionType {
+  TEXT = 'text',                   // Texto digitado no app (Roteiro)
+  VIDEO = 'video',                 // Upload de vídeo (Roteiro storytelling, Cinematografia, Atuação)
+  IMAGE = 'image',                 // Upload de imagem/desenho (Storyboard)
+  AUDIO = 'audio',                 // Upload de áudio (Trilha Sonora)
+}
+
+// Configuração de cada tipo de estágio da Jornada
+export const JOURNEY_STAGE_CONFIG: Record<JourneyStageType, {
+  order: number;
+  name: string;
+  description: string;
+  submissionTypes: SubmissionType[];
+  maxParticipants: number;
+  votingDurationHours: number;
+  objectives: string[];
+}> = {
+  [JourneyStageType.SCREENPLAY]: {
+    order: 1,
+    name: 'Batalha de Roteiro',
+    description: 'Escreva ou narre a história que será a base do curta-metragem',
+    submissionTypes: [SubmissionType.TEXT, SubmissionType.VIDEO],
+    maxParticipants: 8,
+    votingDurationHours: 48,
+    objectives: [
+      'Criar um roteiro original de 3-5 minutos',
+      'Incluir início, meio e fim claros',
+      'Definir pelo menos 2 personagens',
+      'Descrever cenário principal',
+      'Opção A: Digitar roteiro no app | Opção B: Vídeo narrando a história (max 5min)',
+    ],
+  },
+  [JourneyStageType.STORYBOARD]: {
+    order: 2,
+    name: 'Batalha de Storyboard',
+    description: 'Visualize as cenas do roteiro vencedor em quadros ilustrados',
+    submissionTypes: [SubmissionType.IMAGE],
+    maxParticipants: 8,
+    votingDurationHours: 48,
+    objectives: [
+      'Criar mínimo 8 quadros de storyboard',
+      'Seguir fielmente o roteiro vencedor',
+      'Incluir enquadramento e ângulos de câmera',
+      'Indicar movimentos e transições entre cenas',
+      'Pode ser desenhado à mão, digital ou com IA de imagem',
+    ],
+  },
+  [JourneyStageType.CINEMATOGRAPHY]: {
+    order: 3,
+    name: 'Batalha de Direção de Fotografia',
+    description: 'Filme as cenas seguindo o storyboard vencedor',
+    submissionTypes: [SubmissionType.VIDEO],
+    maxParticipants: 4,
+    votingDurationHours: 72,
+    objectives: [
+      'Gravar as cenas conforme o storyboard vencedor',
+      'Aplicar técnicas de iluminação e enquadramento',
+      'Duração: 3-5 minutos de material bruto',
+      'Incluir pelo menos 3 ângulos diferentes',
+      'Upload de vídeo (sem edição de som final)',
+    ],
+  },
+  [JourneyStageType.SOUNDTRACK]: {
+    order: 4,
+    name: 'Batalha de Trilha Sonora',
+    description: 'Crie a trilha sonora e efeitos de som para o material filmado',
+    submissionTypes: [SubmissionType.AUDIO],
+    maxParticipants: 6,
+    votingDurationHours: 48,
+    objectives: [
+      'Compor trilha original que acompanhe o vídeo',
+      'Incluir efeitos sonoros para cenas-chave',
+      'Duração compatível com o vídeo filmado',
+      'Pode usar instrumentos reais, digitais ou IA',
+      'Upload de arquivo de áudio (MP3/WAV)',
+    ],
+  },
+  [JourneyStageType.ACTING]: {
+    order: 5,
+    name: 'Batalha de Atuação',
+    description: 'Atue as cenas do roteiro e finalize o curta-metragem',
+    submissionTypes: [SubmissionType.VIDEO],
+    maxParticipants: 4,
+    votingDurationHours: 72,
+    objectives: [
+      'Atuar seguindo o roteiro vencedor',
+      'Integrar com a direção de fotografia vencedora',
+      'Usar a trilha sonora vencedora como base',
+      'Produzir versão final do curta (3-5 min)',
+      'Upload de vídeo editado completo',
+    ],
+  },
+};
 
 // --- Content / TV ---
 export enum ContentType {

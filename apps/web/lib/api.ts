@@ -68,6 +68,28 @@ export const api = {
     fetchAPI('/investments', { method: 'POST', body: JSON.stringify(data) }),
   getMyInvestments: () => fetchAPI('/investments/my'),
 
+  // Jornada do Herói
+  getJourneys: (tier?: string) =>
+    fetchAPI(`/journeys${tier ? `?tier=${tier}` : ''}`),
+  getJourney: (id: string) => fetchAPI(`/journeys/${id}`),
+  getMyJourneys: () => fetchAPI('/journeys/my'),
+  createJourney: (data: { title?: string; description?: string; tier: string; stakePerStage: number }) =>
+    fetchAPI('/journeys', { method: 'POST', body: JSON.stringify(data) }),
+  joinJourneyStage: (journeyId: string, stageId: string) =>
+    fetchAPI(`/journeys/${journeyId}/stages/${stageId}/join`, { method: 'POST' }),
+  startJourneyStage: (journeyId: string, stageId: string) =>
+    fetchAPI(`/journeys/${journeyId}/stages/${stageId}/start`, { method: 'POST' }),
+  submitJourneyWork: (journeyId: string, stageId: string, data: { type: string; url?: string; text?: string; metadata?: any }) =>
+    fetchAPI(`/journeys/${journeyId}/stages/${stageId}/submit`, { method: 'POST', body: JSON.stringify(data) }),
+  getStageSubmissions: (journeyId: string, stageId: string) =>
+    fetchAPI(`/journeys/${journeyId}/stages/${stageId}/submissions`),
+  voteJourneyStage: (journeyId: string, stageId: string, data: { participantId: string; vitaAmount?: number }) =>
+    fetchAPI(`/journeys/${journeyId}/stages/${stageId}/vote`, { method: 'POST', body: JSON.stringify(data) }),
+  getStageResults: (journeyId: string, stageId: string) =>
+    fetchAPI(`/journeys/${journeyId}/stages/${stageId}/results`),
+  completeJourneyStage: (journeyId: string, stageId: string) =>
+    fetchAPI(`/journeys/${journeyId}/stages/${stageId}/complete`, { method: 'POST' }),
+
   // Content
   getFeatured: () => fetchAPI('/content/featured'),
 

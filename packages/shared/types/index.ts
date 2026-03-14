@@ -68,6 +68,7 @@ export enum VerificationMethod {
   WEARABLE = 'wearable',             // Dados de wearable (Apple Health, Garmin)
   SOCIAL_VALIDATION = 'social_validation', // Validação por pares
   SATELLITE = 'satellite',           // NDVI + IoT (regeneração)
+  PUBLIC_VOTING = 'public_voting',   // Votação pública (Jornada do Herói)
 }
 
 export enum VerificationStatus {
@@ -143,6 +144,40 @@ export enum OrderStatus {
   DELIVERED = 'delivered',
   CANCELLED = 'cancelled',
   REFUNDED = 'refunded',
+}
+
+// --- Jornada do Herói (Hero's Journey) ---
+export enum JourneyStatus {
+  RECRUITING = 'recruiting',
+  STAGE_ACTIVE = 'stage_active',
+  VOTING = 'voting',
+  BETWEEN_STAGES = 'between_stages',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled',
+}
+
+export enum JourneyStageType {
+  SCREENPLAY = 'screenplay',
+  STORYBOARD = 'storyboard',
+  CINEMATOGRAPHY = 'cinematography',
+  SOUNDTRACK = 'soundtrack',
+  ACTING = 'acting',
+}
+
+export enum JourneyStageStatus {
+  PENDING = 'pending',
+  OPEN = 'open',
+  ACTIVE = 'active',
+  VOTING = 'voting',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled',
+}
+
+export enum SubmissionType {
+  TEXT = 'text',
+  VIDEO = 'video',
+  IMAGE = 'image',
+  AUDIO = 'audio',
 }
 
 // --- Content / TV ---
