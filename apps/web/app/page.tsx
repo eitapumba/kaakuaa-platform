@@ -9,6 +9,134 @@ import { useSocket } from '../lib/use-socket'
 import { api } from '../lib/api'
 
 /* ═══════════════════════════════════════
+   SUBCATEGORIES & CHALLENGE MODES
+   ═══════════════════════════════════════ */
+
+interface Subcategory {
+  key: string
+  emoji: string
+  label: string
+  desc: string
+}
+
+interface ChallengeMode {
+  key: string
+  emoji: string
+  label: string
+  desc: string
+  players: string
+  duration: string
+}
+
+// Modos de desafio disponíveis globalmente
+const CHALLENGE_MODES: Record<string, ChallengeMode[]> = {
+  _default: [
+    { key: '1v1', emoji: '⚔️', label: '1 vs 1', desc: 'Duelo clássico', players: '2', duration: '5-30min' },
+    { key: '2v2', emoji: '🤝', label: '2 vs 2', desc: 'Duplas competitivas', players: '4', duration: '10-30min' },
+    { key: 'battle_royale', emoji: '👑', label: 'Battle Royale', desc: 'Todos contra todos — só 1 vence', players: '4-8', duration: '15-45min' },
+    { key: 'speed_run', emoji: '⚡', label: 'Speed Run', desc: 'Quem completa mais rápido', players: '2-6', duration: '5-15min' },
+    { key: 'best_of_3', emoji: '🏆', label: 'Melhor de 3', desc: 'Série de 3 rodadas', players: '2', duration: '15-45min' },
+  ],
+  // Modos especiais por categoria
+  sports_fun: [
+    { key: 'trick_shot', emoji: '🎯', label: 'Trick Shot', desc: 'Acerte a jogada impossível', players: '2-4', duration: '10min' },
+    { key: 'endurance', emoji: '💪', label: 'Resistência', desc: 'Quem aguenta mais', players: '2-8', duration: '30-60min' },
+  ],
+  esports_fun: [
+    { key: 'clutch_1v5', emoji: '🔥', label: 'Clutch Mode', desc: 'Situações impossíveis', players: '2', duration: '10min' },
+    { key: 'no_hud', emoji: '🫣', label: 'Sem HUD', desc: 'Jogue às cegas', players: '2', duration: '15min' },
+  ],
+  rap_fun: [
+    { key: 'tema_surpresa', emoji: '🎲', label: 'Tema Surpresa', desc: 'Tema revelado na hora', players: '2', duration: '5min' },
+    { key: 'tag_team', emoji: '🏷️', label: 'Tag Team', desc: 'Revezamento de rimas', players: '4', duration: '10min' },
+  ],
+  culinary_fun: [
+    { key: 'mystery_box', emoji: '📦', label: 'Caixa Mistério', desc: 'Ingredientes surpresa', players: '2-4', duration: '30min' },
+    { key: 'speed_cook', emoji: '⏱️', label: 'Speed Cook', desc: 'Cozinhe em 10 minutos', players: '2-4', duration: '10min' },
+  ],
+}
+
+// Subcategorias por categoria
+const SUBCATEGORIES: Record<string, Subcategory[]> = {
+  sports: [
+    { key: 'futebol', emoji: '⚽', label: 'Futebol', desc: 'Gols, dribles e embaixadinhas' },
+    { key: 'basquete', emoji: '🏀', label: 'Basquete', desc: 'Arremessos e enterradas' },
+    { key: 'tenis', emoji: '🎾', label: 'Tênis', desc: 'Saques e rallies' },
+    { key: 'natacao', emoji: '🏊', label: 'Natação', desc: 'Velocidade e resistência na água' },
+    { key: 'corrida', emoji: '🏃', label: 'Corrida', desc: 'Sprints e provas de fundo' },
+    { key: 'mma', emoji: '🥊', label: 'MMA / Luta', desc: 'Artes marciais e boxe' },
+    { key: 'crossfit', emoji: '🏋️', label: 'CrossFit', desc: 'WODs e desafios funcionais' },
+    { key: 'surf', emoji: '🏄', label: 'Surf', desc: 'Manobras e ondas' },
+    { key: 'skate', emoji: '🛹', label: 'Skate', desc: 'Tricks e manobras' },
+    { key: 'ciclismo', emoji: '🚴', label: 'Ciclismo', desc: 'Velocidade e trilhas' },
+    { key: 'volei', emoji: '🏐', label: 'Vôlei', desc: 'Ataques e bloqueios' },
+    { key: 'ginastica', emoji: '🤸', label: 'Ginástica', desc: 'Flexibilidade e acrobacias' },
+  ],
+  esports: [
+    { key: 'fifa', emoji: '⚽', label: 'EA FC / FIFA', desc: 'Futebol digital' },
+    { key: 'lol', emoji: '🧙', label: 'League of Legends', desc: 'MOBA estratégico' },
+    { key: 'valorant', emoji: '🔫', label: 'Valorant', desc: 'FPS tático' },
+    { key: 'cs2', emoji: '💣', label: 'Counter-Strike 2', desc: 'FPS competitivo' },
+    { key: 'fortnite', emoji: '🏗️', label: 'Fortnite', desc: 'Battle royale e construção' },
+    { key: 'rocket_league', emoji: '🚗', label: 'Rocket League', desc: 'Futebol com carros' },
+    { key: 'street_fighter', emoji: '👊', label: 'Street Fighter', desc: 'Luta 1v1 clássica' },
+    { key: 'tekken', emoji: '🥋', label: 'Tekken', desc: 'Combate 3D' },
+    { key: 'apex', emoji: '🎯', label: 'Apex Legends', desc: 'Battle royale FPS' },
+    { key: 'cod', emoji: '🪖', label: 'Call of Duty', desc: 'Ação FPS' },
+    { key: 'chess', emoji: '♟️', label: 'Xadrez Online', desc: 'Estratégia clássica' },
+    { key: 'mario_kart', emoji: '🏎️', label: 'Mario Kart', desc: 'Corrida divertida' },
+  ],
+  personal_evolution: [
+    { key: 'meditacao', emoji: '🧘', label: 'Meditação', desc: 'Minutos de prática meditativa' },
+    { key: 'leitura', emoji: '📚', label: 'Leitura', desc: 'Páginas lidas e resumos' },
+    { key: 'idiomas', emoji: '🌍', label: 'Idiomas', desc: 'Aprenda palavras e frases' },
+    { key: 'fitness', emoji: '💪', label: 'Fitness', desc: 'Exercícios e metas físicas' },
+    { key: 'jejum', emoji: '🕐', label: 'Jejum', desc: 'Desafios de jejum intermitente' },
+    { key: 'gratidao', emoji: '🙏', label: 'Gratidão', desc: 'Diários e práticas de gratidão' },
+    { key: 'cold_exposure', emoji: '🧊', label: 'Exposição ao Frio', desc: 'Banhos gelados e desafios' },
+    { key: 'habitos', emoji: '📋', label: 'Hábitos', desc: 'Construa rotinas vencedoras' },
+    { key: 'financas', emoji: '💰', label: 'Finanças', desc: 'Economia e investimento pessoal' },
+  ],
+  arts: [
+    { key: 'desenho', emoji: '✏️', label: 'Desenho', desc: 'Crie arte com lápis ou digital' },
+    { key: 'pintura', emoji: '🎨', label: 'Pintura', desc: 'Quadros e arte visual' },
+    { key: 'fotografia', emoji: '📸', label: 'Fotografia', desc: 'Capture o momento perfeito' },
+    { key: 'musica', emoji: '🎵', label: 'Música', desc: 'Instrumentos e composição' },
+    { key: 'danca', emoji: '💃', label: 'Dança', desc: 'Coreografias e freestyle' },
+    { key: 'grafite', emoji: '🖌️', label: 'Grafite / Street Art', desc: 'Arte urbana' },
+    { key: 'poesia', emoji: '📝', label: 'Poesia', desc: 'Versos e rimas escritas' },
+    { key: 'escultura', emoji: '🗿', label: 'Escultura', desc: 'Arte tridimensional' },
+    { key: 'digital_art', emoji: '🖥️', label: 'Arte Digital', desc: 'Ilustração e design' },
+  ],
+  rap_battle: [
+    { key: 'freestyle', emoji: '🎤', label: 'Freestyle', desc: 'Improviso puro ao vivo' },
+    { key: 'escrito', emoji: '📝', label: 'Escrito', desc: 'Rimas preparadas com delivery' },
+    { key: 'beatbox', emoji: '🥁', label: 'Beatbox', desc: 'Ritmos com a boca' },
+    { key: 'trap', emoji: '🔊', label: 'Trap / Drill', desc: 'Estilo trap e drill' },
+    { key: 'storytelling', emoji: '📖', label: 'Storytelling', desc: 'Conte uma história rimando' },
+    { key: 'roast', emoji: '🔥', label: 'Roast Battle', desc: 'Humor afiado em rimas' },
+  ],
+  culinary: [
+    { key: 'brasileira', emoji: '🇧🇷', label: 'Brasileira', desc: 'Feijoada, moqueca e mais' },
+    { key: 'japonesa', emoji: '🍣', label: 'Japonesa', desc: 'Sushi, ramen e temaki' },
+    { key: 'italiana', emoji: '🍝', label: 'Italiana', desc: 'Pasta, pizza e risoto' },
+    { key: 'confeitaria', emoji: '🎂', label: 'Confeitaria', desc: 'Bolos, doces e sobremesas' },
+    { key: 'vegana', emoji: '🥗', label: 'Vegana / Saudável', desc: 'Receitas plant-based' },
+    { key: 'churrasco', emoji: '🥩', label: 'Churrasco', desc: 'Carnes e grelhados' },
+    { key: 'mexicana', emoji: '🌮', label: 'Mexicana', desc: 'Tacos, burritos e molhos' },
+    { key: 'drinks', emoji: '🍹', label: 'Drinks & Coquetéis', desc: 'Mixologia criativa' },
+  ],
+}
+
+// Função para pegar os modos de desafio baseado na categoria
+function getChallengeModes(categoryKey: string): ChallengeMode[] {
+  const base = CHALLENGE_MODES._default
+  const funKey = `${categoryKey}_fun`
+  const extra = CHALLENGE_MODES[funKey] || []
+  return [...base, ...extra]
+}
+
+/* ═══════════════════════════════════════
    LANDING PAGE — for visitors
    ═══════════════════════════════════════ */
 
@@ -155,12 +283,12 @@ function LandingPage() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
             {[
-              { emoji: '🏋️', label: 'Sports', desc: 'Desafios físicos ao vivo' },
-              { emoji: '🎮', label: 'E-Sports', desc: 'Games competitivos em tempo real' },
-              { emoji: '🧠', label: 'Evolução Pessoal', desc: 'Cresça enquanto compete' },
-              { emoji: '🎨', label: 'Artes', desc: 'Criatividade em desafio ao vivo' },
-              { emoji: '🎤', label: 'Rap Battle', desc: 'Batalhas de rima e improviso' },
-              { emoji: '🍳', label: 'Culinária', desc: 'Duelos gastronômicos ao vivo' },
+              { emoji: '🏋️', label: 'Sports', desc: 'Futebol, basquete, MMA e mais' },
+              { emoji: '🎮', label: 'E-Sports', desc: 'FIFA, Valorant, LoL e mais' },
+              { emoji: '🧠', label: 'Evolução Pessoal', desc: 'Meditação, leitura, hábitos' },
+              { emoji: '🎨', label: 'Artes', desc: 'Desenho, música, fotografia' },
+              { emoji: '🎤', label: 'Rap Battle', desc: 'Freestyle, beatbox, roast' },
+              { emoji: '🍳', label: 'Culinária', desc: 'Brasileira, japonesa, confeitaria' },
               { emoji: '🎬', label: 'Jornada do Herói', desc: 'Do roteiro ao curta-metragem' },
             ].map((cat, i) => (
               <div
@@ -260,7 +388,7 @@ const CATEGORIES = [
   { key: 'sports', emoji: '🏋️', label: 'Sports', desc: 'Desafios físicos ao vivo', online: 47 },
   { key: 'esports', emoji: '🎮', label: 'E-Sports', desc: 'Games competitivos', online: 124 },
   { key: 'personal_evolution', emoji: '🧠', label: 'Evolução', desc: 'Crescimento pessoal', online: 33 },
-  { key: 'regeneration', emoji: '🌿', label: 'Regeneração', desc: 'Impacto ambiental', online: 18 },
+  { key: 'arts', emoji: '🎨', label: 'Artes', desc: 'Criatividade em desafio', online: 22 },
   { key: 'rap_battle', emoji: '🎤', label: 'Rap Battle', desc: 'Batalhas de rima', online: 9 },
   { key: 'culinary', emoji: '🍳', label: 'Culinária', desc: 'Duelos gastronômicos', online: 15 },
 ]
@@ -273,7 +401,7 @@ const STAKES = [
   { amount: 2000, tier: 'Diamond' },
 ]
 
-type Phase = 'home' | 'stake' | 'searching' | 'match' | 'live'
+type Phase = 'home' | 'subcategory' | 'mode' | 'stake' | 'searching' | 'match' | 'live'
 
 /* ─── Nav ─── */
 function Nav({ user, onLogout }: { user: any; onLogout: () => void }) {
@@ -322,6 +450,8 @@ export default function HomePage() {
 
   const [phase, setPhase] = useState<Phase>('home')
   const [selectedCat, setSelectedCat] = useState('')
+  const [selectedSubcat, setSelectedSubcat] = useState('')
+  const [selectedMode, setSelectedMode] = useState('')
   const [selectedStake, setSelectedStake] = useState(200)
   const [preferLive, setPreferLive] = useState(true)
   const [countdown, setCountdown] = useState(5)
@@ -396,8 +526,28 @@ export default function HomePage() {
       return
     }
     setSelectedCat(key)
+    setSelectedSubcat('')
+    setSelectedMode('')
+    // Se a categoria tem subcategorias, mostrar seleção
+    if (SUBCATEGORIES[key]) {
+      setPhase('subcategory')
+    } else {
+      setPhase('stake')
+    }
+  }
+
+  const handleSelectSubcategory = (subKey: string) => {
+    setSelectedSubcat(subKey)
+    setPhase('mode')
+  }
+
+  const handleSelectMode = (modeKey: string) => {
+    setSelectedMode(modeKey)
     setPhase('stake')
   }
+
+  const subcatInfo = SUBCATEGORIES[selectedCat]?.find(s => s.key === selectedSubcat)
+  const modeInfo = getChallengeModes(selectedCat).find(m => m.key === selectedMode)
 
   const handleSearch = async () => {
     setPhase('searching')
@@ -591,14 +741,15 @@ export default function HomePage() {
   }
 
   // ═══════════════════════════════════
-  // PHASE: STAKE
+  // PHASE: SUBCATEGORY
   // ═══════════════════════════════════
-  if (phase === 'stake') {
+  if (phase === 'subcategory') {
+    const subs = SUBCATEGORIES[selectedCat] || []
     return (
       <div className="min-h-screen">
         <Nav user={user} onLogout={logout} />
         <section className="pt-28 pb-16 px-6">
-          <div className="max-w-lg mx-auto">
+          <div className="max-w-4xl mx-auto">
             <button onClick={() => setPhase('home')} className="flex items-center gap-2 text-sm text-kk-text-muted hover:text-gold transition-colors mb-8">
               <span>←</span> Voltar
             </button>
@@ -608,6 +759,170 @@ export default function HomePage() {
                 <span className="text-5xl">{catInfo?.emoji}</span>
               </div>
               <h2 className="font-serif text-heading">{catInfo?.label}</h2>
+              <p className="text-sm text-kk-text-muted mt-2">Escolha sua modalidade</p>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {subs.map((sub, i) => (
+                <button
+                  key={sub.key}
+                  onClick={() => handleSelectSubcategory(sub.key)}
+                  className="premium-card group text-center p-5 cursor-pointer hover:border-gold transition-all duration-300"
+                  style={{ animationDelay: `${i * 0.05}s` }}
+                >
+                  <div className="w-14 h-14 rounded-2xl bg-sage-light flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-500">
+                    <span className="text-3xl">{sub.emoji}</span>
+                  </div>
+                  <h3 className="font-serif text-base font-normal text-kk-text mb-1">{sub.label}</h3>
+                  <p className="text-[11px] text-kk-text-muted font-light leading-relaxed">{sub.desc}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+      </div>
+    )
+  }
+
+  // ═══════════════════════════════════
+  // PHASE: MODE (Challenge Type)
+  // ═══════════════════════════════════
+  if (phase === 'mode') {
+    const modes = getChallengeModes(selectedCat)
+    return (
+      <div className="min-h-screen">
+        <Nav user={user} onLogout={logout} />
+        <section className="pt-28 pb-16 px-6">
+          <div className="max-w-3xl mx-auto">
+            <button onClick={() => setPhase('subcategory')} className="flex items-center gap-2 text-sm text-kk-text-muted hover:text-gold transition-colors mb-8">
+              <span>←</span> Voltar
+            </button>
+
+            <div className="text-center mb-10">
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <div className="w-14 h-14 rounded-2xl bg-sage-light flex items-center justify-center">
+                  <span className="text-3xl">{catInfo?.emoji}</span>
+                </div>
+                <span className="text-kk-text-muted text-xl">→</span>
+                <div className="w-14 h-14 rounded-2xl bg-beige flex items-center justify-center">
+                  <span className="text-3xl">{subcatInfo?.emoji}</span>
+                </div>
+              </div>
+              <h2 className="font-serif text-heading">{subcatInfo?.label}</h2>
+              <p className="text-sm text-kk-text-muted mt-2">Escolha o modo de desafio</p>
+            </div>
+
+            {/* Modos clássicos */}
+            <div className="mb-6">
+              <p className="sec-label mb-4">Modos Clássicos</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {modes.filter(m => CHALLENGE_MODES._default.some(d => d.key === m.key)).map((mode, i) => (
+                  <button
+                    key={mode.key}
+                    onClick={() => handleSelectMode(mode.key)}
+                    className="premium-card group text-left p-5 cursor-pointer hover:border-gold transition-all duration-300"
+                    style={{ animationDelay: `${i * 0.06}s` }}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-sage-light flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-500">
+                        <span className="text-2xl">{mode.emoji}</span>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-serif text-lg font-normal text-kk-text">{mode.label}</h3>
+                        <p className="text-xs text-kk-text-muted font-light mt-0.5">{mode.desc}</p>
+                        <div className="flex items-center gap-3 mt-2">
+                          <span className="text-[10px] text-gold bg-gold/10 px-2 py-0.5 rounded-full">{mode.players} jogadores</span>
+                          <span className="text-[10px] text-kk-text-muted">{mode.duration}</span>
+                        </div>
+                      </div>
+                      <span className="text-gold text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                        Jogar →
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Modos divertidos (se existirem) */}
+            {modes.filter(m => !CHALLENGE_MODES._default.some(d => d.key === m.key)).length > 0 && (
+              <div>
+                <p className="sec-label mb-4">Modos Divertidos</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {modes.filter(m => !CHALLENGE_MODES._default.some(d => d.key === m.key)).map((mode, i) => (
+                    <button
+                      key={mode.key}
+                      onClick={() => handleSelectMode(mode.key)}
+                      className="premium-card group text-left p-5 cursor-pointer hover:border-gold transition-all duration-300 border-dashed"
+                      style={{ animationDelay: `${i * 0.06}s` }}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-beige flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-500">
+                          <span className="text-2xl">{mode.emoji}</span>
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-serif text-lg font-normal text-kk-text">{mode.label}</h3>
+                          <p className="text-xs text-kk-text-muted font-light mt-0.5">{mode.desc}</p>
+                          <div className="flex items-center gap-3 mt-2">
+                            <span className="text-[10px] text-gold bg-gold/10 px-2 py-0.5 rounded-full">{mode.players} jogadores</span>
+                            <span className="text-[10px] text-kk-text-muted">{mode.duration}</span>
+                          </div>
+                        </div>
+                        <span className="text-gold text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                          Jogar →
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+      </div>
+    )
+  }
+
+  // ═══════════════════════════════════
+  // PHASE: STAKE
+  // ═══════════════════════════════════
+  if (phase === 'stake') {
+    return (
+      <div className="min-h-screen">
+        <Nav user={user} onLogout={logout} />
+        <section className="pt-28 pb-16 px-6">
+          <div className="max-w-lg mx-auto">
+            <button onClick={() => selectedMode ? setPhase('mode') : selectedSubcat ? setPhase('subcategory') : setPhase('home')} className="flex items-center gap-2 text-sm text-kk-text-muted hover:text-gold transition-colors mb-8">
+              <span>←</span> Voltar
+            </button>
+
+            <div className="text-center mb-10">
+              {/* Breadcrumb visual */}
+              <div className="flex items-center justify-center gap-2 mb-4 flex-wrap">
+                <div className="w-14 h-14 rounded-2xl bg-sage-light flex items-center justify-center">
+                  <span className="text-2xl">{catInfo?.emoji}</span>
+                </div>
+                {subcatInfo && (
+                  <>
+                    <span className="text-kk-text-muted text-lg">→</span>
+                    <div className="w-14 h-14 rounded-2xl bg-beige flex items-center justify-center">
+                      <span className="text-2xl">{subcatInfo.emoji}</span>
+                    </div>
+                  </>
+                )}
+                {modeInfo && (
+                  <>
+                    <span className="text-kk-text-muted text-lg">→</span>
+                    <div className="w-14 h-14 rounded-2xl bg-sage-light flex items-center justify-center">
+                      <span className="text-2xl">{modeInfo.emoji}</span>
+                    </div>
+                  </>
+                )}
+              </div>
+              <h2 className="font-serif text-heading">
+                {subcatInfo ? subcatInfo.label : catInfo?.label}
+                {modeInfo ? ` · ${modeInfo.label}` : ''}
+              </h2>
               <p className="text-sm text-kk-text-muted mt-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block mr-1.5 animate-pulse" />
                 {catInfo?.online} jogadores online
