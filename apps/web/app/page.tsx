@@ -636,6 +636,9 @@ export default function HomePage() {
   // Frame capture for AI analysis
   const capturedFramesRef = useRef<string[]>([])
 
+  // Touch swipe ref for carousel
+  const touchStartRef = useRef<number>(0)
+
   const catInfo = CATEGORIES.find(c => c.key === selectedCat)
   const pool = selectedStake * 2
   const winnerReceives = (pool * 0.70).toFixed(2)
@@ -1077,6 +1080,18 @@ export default function HomePage() {
   const formatTime = (s: number) =>
     `${Math.floor(s / 60).toString().padStart(2, '0')}:${(s % 60).toString().padStart(2, '0')}`
 
+  // Keyboard nav for carousel (home phase)
+  useEffect(() => {
+    if (phase !== 'home') return
+    const allSlides = [...CATEGORIES, { key: 'friend', emoji: '👥', label: 'Desafiar Amigo', desc: '', online: 0, img: '' }]
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') setCarouselIndex(i => i === allSlides.length - 1 ? 0 : i + 1)
+      else if (e.key === 'ArrowLeft') setCarouselIndex(i => i === 0 ? allSlides.length - 1 : i - 1)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [phase])
+
   // Loading auth
   if (authLoading) {
     return (
@@ -1155,24 +1170,11 @@ export default function HomePage() {
     }
 
     // Swipe support
-    const touchStartRef = useRef<number>(0)
     const handleTouchStart = (e: React.TouchEvent) => { touchStartRef.current = e.touches[0].clientX }
     const handleTouchEnd = (e: React.TouchEvent) => {
       const diff = touchStartRef.current - e.changedTouches[0].clientX
       if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide() }
     }
-
-    // Keyboard nav
-    useEffect(() => {
-      if (phase !== 'home') return
-      const onKey = (e: KeyboardEvent) => {
-        if (e.key === 'ArrowRight') nextSlide()
-        else if (e.key === 'ArrowLeft') prevSlide()
-        else if (e.key === 'Enter') handleEnterCategory()
-      }
-      window.addEventListener('keydown', onKey)
-      return () => window.removeEventListener('keydown', onKey)
-    }, [phase, carouselIndex])
 
     return (
       <div
