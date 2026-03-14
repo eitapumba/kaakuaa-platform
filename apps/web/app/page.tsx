@@ -529,13 +529,13 @@ function LandingPage() {
    ═══════════════════════════════════════ */
 
 const CATEGORIES = [
-  { key: 'sports', emoji: '🏋️', label: 'Sports', desc: 'Desafios físicos ao vivo', online: 47 },
-  { key: 'esports', emoji: '🎮', label: 'E-Sports', desc: 'Games competitivos', online: 124 },
-  { key: 'personal_evolution', emoji: '🧠', label: 'Evolução', desc: 'Crescimento pessoal', online: 33 },
-  { key: 'arts', emoji: '🎨', label: 'Artes', desc: 'Criatividade em desafio', online: 22 },
-  { key: 'rap_battle', emoji: '🎤', label: 'Rap Battle', desc: 'Batalhas de rima', online: 9 },
-  { key: 'culinary', emoji: '🍳', label: 'Culinária', desc: 'Duelos gastronômicos', online: 15 },
-  { key: 'hero_journey', emoji: '🎬', label: 'Jornada do Herói', desc: 'Do roteiro ao curta-metragem', online: 18 },
+  { key: 'sports', emoji: '🏋️', label: 'Sports', desc: 'Desafios físicos ao vivo', online: 47, img: '/img/arena-bg.jpg' },
+  { key: 'esports', emoji: '🎮', label: 'E-Sports', desc: 'Games competitivos', online: 124, img: '/img/categories/online-games.jpg' },
+  { key: 'personal_evolution', emoji: '🧠', label: 'Evolução', desc: 'Crescimento pessoal', online: 33, img: '/img/arena-bg.jpg' },
+  { key: 'arts', emoji: '🎨', label: 'Artes', desc: 'Criatividade em desafio', online: 22, img: '/img/categories/artes.jpg' },
+  { key: 'rap_battle', emoji: '🎤', label: 'Rap Battle', desc: 'Batalhas de rima', online: 9, img: '/img/categories/rap.jpg' },
+  { key: 'culinary', emoji: '🍳', label: 'Culinária', desc: 'Duelos gastronômicos', online: 15, img: '/img/categories/culinaria.jpg' },
+  { key: 'hero_journey', emoji: '🎬', label: 'Jornada do Herói', desc: 'Do roteiro ao curta-metragem', online: 18, img: '/img/arena-bg.jpg' },
 ]
 
 const STAKES = [
@@ -546,7 +546,7 @@ const STAKES = [
   { amount: 2000, tier: 'Diamond' },
 ]
 
-type Phase = 'home' | 'friend_category' | 'subcategory' | 'mode' | 'stake' | 'searching' | 'match' | 'live' | 'judging' | 'result' | 'create_challenge'
+type Phase = 'splash' | 'home' | 'friend_category' | 'subcategory' | 'mode' | 'stake' | 'searching' | 'match' | 'live' | 'judging' | 'result' | 'create_challenge'
 type MatchType = 'online' | 'friend'
 
 /* ─── Nav ─── */
@@ -598,7 +598,7 @@ export default function HomePage() {
     sendVote, watchChallenge, submitFrame,
   } = useSocket(user?.id)
 
-  const [phase, setPhase] = useState<Phase>('home')
+  const [phase, setPhase] = useState<Phase>('splash')
   const [selectedCat, setSelectedCat] = useState('')
   const [selectedSubcat, setSelectedSubcat] = useState('')
   const [selectedMode, setSelectedMode] = useState('')
@@ -609,6 +609,8 @@ export default function HomePage() {
   const [apiLoading, setApiLoading] = useState(false)
   const [matchType, setMatchType] = useState<MatchType>('online')
   const [friendCode, setFriendCode] = useState('')
+  const [carouselIndex, setCarouselIndex] = useState(0)
+  const [splashFading, setSplashFading] = useState(false)
   const [challengeTheme, setChallengeTheme] = useState('')
   const [challengeTimer, setChallengeTimer] = useState(0)
   const [timerRemaining, setTimerRemaining] = useState(0)
@@ -1101,149 +1103,189 @@ export default function HomePage() {
   }
 
   // ═══════════════════════════════════
-  // PHASE: HOME
+  // PHASE: SPLASH (Logo on white)
   // ═══════════════════════════════════
-  if (phase === 'home') {
-    const displayName = user?.displayName || 'Guerreiro'
-    const vitaBalance = user?.vitaBalance || 0
-    const wins = user?.challengesWon || 0
-    const completed = user?.challengesCompleted || 0
-    const losses = completed - wins
-    const totalEarnings = user?.totalEarnings || 0
-
+  if (phase === 'splash') {
     return (
-      <div className="min-h-screen">
-        <Nav user={user} onLogout={logout} />
-
-        <section className="pt-28 pb-16 px-6">
-          <div className="max-w-6xl mx-auto">
-            {/* Greeting */}
-            <div className="flex items-center justify-between mb-12">
-              <div>
-                <p className="sec-label mb-3">
-                  {new Date().getHours() < 12 ? 'Bom dia' : new Date().getHours() < 18 ? 'Boa tarde' : 'Boa noite'}, {displayName}
-                </p>
-                <h1 className="font-serif text-display">
-                  Desafie-se.<br />
-                  <span className="bg-gold-gradient bg-clip-text text-transparent">Regenere o Planeta.</span>
-                </h1>
-              </div>
-              <div className="hidden md:flex items-center gap-5">
-                <div className="text-right">
-                  <p className="stat-num">{vitaBalance.toLocaleString()}</p>
-                  <p className="text-xs text-kk-text-muted mt-1">VITA</p>
-                </div>
-                <div className="w-px h-10 bg-gold-muted" />
-                <div className="text-right">
-                  <p className="stat-num">{wins}-{losses}</p>
-                  <p className="text-xs text-kk-text-muted mt-1">W-L</p>
-                </div>
-                <div className="w-px h-10 bg-gold-muted" />
-                <div className="text-right">
-                  <p className="stat-num">R${totalEarnings}</p>
-                  <p className="text-xs text-kk-text-muted mt-1">Ganhos</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Mobile stats */}
-            <div className="grid grid-cols-3 gap-3 mb-10 md:hidden">
-              {[
-                { val: vitaBalance.toLocaleString(), label: 'VITA' },
-                { val: `${wins}-${losses}`, label: 'W-L' },
-                { val: `R$${totalEarnings}`, label: 'Ganhos' },
-              ].map(s => (
-                <div key={s.label} className="glass-card rounded-2xl p-4 text-center">
-                  <p className="stat-num text-xl">{s.val}</p>
-                  <p className="text-xs text-kk-text-muted mt-1">{s.label}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Section label */}
-            <div className="flex items-center gap-4 mb-6">
-              <p className="sec-label">Escolha seu desafio</p>
-              <div className="gold-line flex-1" />
-            </div>
-
-            {/* Category Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
-              {CATEGORIES.map((cat, i) => (
-                <button
-                  key={cat.key}
-                  onClick={() => { setMatchType('online'); handleSelectCategory(cat.key) }}
-                  className="premium-card group text-left p-0 cursor-pointer"
-                  style={{ animationDelay: `${i * 0.08}s` }}
-                >
-                  <div className="p-6 pb-5">
-                    <div className="w-14 h-14 rounded-2xl bg-sage-light flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-500">
-                      <span className="text-3xl">{cat.emoji}</span>
-                    </div>
-                    <h3 className="font-serif text-xl font-normal text-kk-text mb-1">{cat.label}</h3>
-                    <p className="text-xs text-kk-text-muted font-light">{cat.desc}</p>
-                  </div>
-                  <div className="px-6 py-3 border-t border-gold-muted flex items-center justify-between">
-                    <span className="flex items-center gap-1.5 text-xs text-kk-text-muted">
-                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                      {cat.online} online
-                    </span>
-                    <span className="text-gold text-xs font-medium tracking-wide group-hover:translate-x-1 transition-transform">
-                      Jogar →
-                    </span>
-                  </div>
-                </button>
-              ))}
-
-              {/* Desafiar Amigo — entrada principal no dashboard */}
-              <button
-                onClick={() => { setMatchType('friend'); setPhase('friend_category') }}
-                className="premium-card group text-left p-0 cursor-pointer border-2 border-dashed border-gold-muted hover:border-gold"
-                style={{ animationDelay: `${CATEGORIES.length * 0.08}s` }}
-              >
-                <div className="p-6 pb-5">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold/20 to-sage-light flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-500">
-                    <span className="text-3xl">👥</span>
-                  </div>
-                  <h3 className="font-serif text-xl font-normal text-kk-text mb-1">Desafiar Amigo</h3>
-                  <p className="text-xs text-kk-text-muted font-light">Escolha uma categoria e desafie um amigo</p>
-                </div>
-                <div className="px-6 py-3 border-t border-gold-muted flex items-center justify-between">
-                  <span className="flex items-center gap-1.5 text-xs text-kk-text-muted">
-                    <span className="text-sm">🔗</span>
-                    Via código
-                  </span>
-                  <span className="text-gold text-xs font-medium tracking-wide group-hover:translate-x-1 transition-transform">
-                    Desafiar →
-                  </span>
-                </div>
-              </button>
-            </div>
-
-            {/* Create custom challenge button */}
-            <div className="mt-8 flex justify-center">
-              <button
-                onClick={() => setPhase('create_challenge')}
-                className="btn-outline text-sm py-3 px-8 flex items-center gap-2"
-              >
-                🎯 Criar Desafio Customizado
-              </button>
-            </div>
-
-            {/* Regeneration banner */}
-            <div className="mt-8 glass-card rounded-3xl p-8 flex items-center gap-6">
-              <div className="w-16 h-16 rounded-2xl bg-sage-light flex items-center justify-center text-3xl flex-shrink-0">
-                🌱
-              </div>
-              <div>
-                <h3 className="font-serif text-lg">Cada desafio regenera o planeta</h3>
-                <p className="text-sm text-kk-text-muted mt-1">
-                  30% de cada pool vai para projetos de regeneração ambiental — eco-vilas, reflorestamento e água limpa.
-                </p>
-              </div>
-              <p className="stat-num hidden md:block flex-shrink-0">R${Math.floor(totalEarnings * 0.3)}</p>
+      <div
+        className="fixed inset-0 flex flex-col items-center justify-center cursor-pointer select-none"
+        style={{ background: '#f5f3ef' }}
+        onClick={() => {
+          setSplashFading(true)
+          setTimeout(() => { setPhase('home'); setSplashFading(false) }, 600)
+        }}
+      >
+        <div className={`flex flex-col items-center transition-all duration-600 ${splashFading ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
+          <img
+            src="/img/logo-jungle-games.png"
+            alt="Jungle Games"
+            className="w-64 sm:w-80 md:w-96 h-auto"
+            style={{ filter: 'drop-shadow(0 8px 32px rgba(160,130,80,0.15))' }}
+          />
+          <div className="mt-10 flex flex-col items-center gap-3">
+            <p className="text-sm tracking-[0.3em] uppercase text-stone-400 font-light animate-pulse">
+              Toque para entrar
+            </p>
+            <div className="w-8 h-8 border border-stone-300 rounded-full flex items-center justify-center">
+              <span className="text-stone-400 text-xs">▶</span>
             </div>
           </div>
-        </section>
+        </div>
+      </div>
+    )
+  }
+
+  // ═══════════════════════════════════
+  // PHASE: HOME — Fullscreen carousel
+  // ═══════════════════════════════════
+  if (phase === 'home') {
+    const allSlides = [...CATEGORIES, { key: 'friend', emoji: '👥', label: 'Desafiar Amigo', desc: 'Escolha uma categoria e desafie um amigo', online: 0, img: '/img/categories/escolha-batalha.jpg' }]
+    const current = allSlides[carouselIndex]
+    const prevSlide = () => setCarouselIndex(i => i === 0 ? allSlides.length - 1 : i - 1)
+    const nextSlide = () => setCarouselIndex(i => i === allSlides.length - 1 ? 0 : i + 1)
+
+    const handleEnterCategory = () => {
+      if (current.key === 'friend') {
+        setMatchType('friend')
+        setPhase('friend_category')
+      } else {
+        setMatchType('online')
+        handleSelectCategory(current.key)
+      }
+    }
+
+    // Swipe support
+    const touchStartRef = useRef<number>(0)
+    const handleTouchStart = (e: React.TouchEvent) => { touchStartRef.current = e.touches[0].clientX }
+    const handleTouchEnd = (e: React.TouchEvent) => {
+      const diff = touchStartRef.current - e.changedTouches[0].clientX
+      if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide() }
+    }
+
+    // Keyboard nav
+    useEffect(() => {
+      if (phase !== 'home') return
+      const onKey = (e: KeyboardEvent) => {
+        if (e.key === 'ArrowRight') nextSlide()
+        else if (e.key === 'ArrowLeft') prevSlide()
+        else if (e.key === 'Enter') handleEnterCategory()
+      }
+      window.addEventListener('keydown', onKey)
+      return () => window.removeEventListener('keydown', onKey)
+    }, [phase, carouselIndex])
+
+    return (
+      <div
+        className="fixed inset-0 overflow-hidden select-none"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        {/* Background image with transition */}
+        {allSlides.map((slide, idx) => (
+          <div
+            key={slide.key}
+            className="absolute inset-0 bg-cover bg-center transition-opacity duration-700"
+            style={{
+              backgroundImage: `url(${slide.img})`,
+              opacity: idx === carouselIndex ? 1 : 0,
+              zIndex: idx === carouselIndex ? 1 : 0,
+            }}
+          />
+        ))}
+
+        {/* Dark overlay for readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/20 z-10" />
+
+        {/* Top bar: Logo + user info */}
+        <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-5 py-4">
+          <img
+            src="/img/logo-jungle-games.png"
+            alt="Jungle Games"
+            className="h-10 w-auto cursor-pointer"
+            style={{ filter: 'brightness(0) invert(1) drop-shadow(0 2px 8px rgba(0,0,0,0.5))' }}
+            onClick={() => { setPhase('splash'); setCarouselIndex(0) }}
+          />
+          {user && (
+            <div className="flex items-center gap-3">
+              <div className="text-right hidden sm:block">
+                <p className="text-white text-xs font-medium drop-shadow">{user.displayName}</p>
+                <p className="text-white/60 text-[10px]">{user.vitaBalance || 0} VITA</p>
+              </div>
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white text-sm font-bold shadow-lg">
+                {user.displayName?.[0] || 'U'}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Left Arrow */}
+        <button
+          onClick={prevSlide}
+          className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-black/40 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-black/60 active:scale-90 transition-all"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+
+        {/* Right Arrow */}
+        <button
+          onClick={nextSlide}
+          className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-black/40 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-black/60 active:scale-90 transition-all"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+
+        {/* Bottom content area */}
+        <div className="absolute bottom-0 left-0 right-0 z-20 px-6 pb-8 pt-20">
+          <div className="max-w-lg mx-auto text-center">
+            {/* Category emoji */}
+            <div className="mb-3">
+              <span className="text-5xl sm:text-6xl drop-shadow-lg">{current.emoji}</span>
+            </div>
+
+            {/* Category name */}
+            <h1 className="text-white text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight drop-shadow-lg" style={{ fontFamily: 'system-ui, -apple-system, sans-serif', textShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
+              {current.label}
+            </h1>
+
+            {/* Description */}
+            <p className="text-white/80 text-sm sm:text-base mt-2 font-light drop-shadow" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
+              {current.desc}
+            </p>
+
+            {/* Online count */}
+            {current.online > 0 && (
+              <div className="mt-3 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10">
+                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                <span className="text-white/80 text-xs">{current.online} online agora</span>
+              </div>
+            )}
+
+            {/* Enter button */}
+            <div className="mt-6">
+              <button
+                onClick={handleEnterCategory}
+                className="px-10 py-4 rounded-2xl text-white font-semibold text-base sm:text-lg tracking-wide shadow-2xl active:scale-95 transition-all duration-200"
+                style={{
+                  background: 'linear-gradient(135deg, #c9a96e 0%, #a0835a 50%, #c9a96e 100%)',
+                  boxShadow: '0 8px 32px rgba(160,130,80,0.4), inset 0 1px 0 rgba(255,255,255,0.2)',
+                }}
+              >
+                {current.key === 'friend' ? '👥 Desafiar Amigo' : '⚔️ Entrar na Arena'}
+              </button>
+            </div>
+
+            {/* Dot indicators */}
+            <div className="mt-6 flex items-center justify-center gap-2">
+              {allSlides.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCarouselIndex(idx)}
+                  className={`rounded-full transition-all duration-300 ${idx === carouselIndex ? 'w-8 h-2.5 bg-amber-400' : 'w-2.5 h-2.5 bg-white/40 hover:bg-white/60'}`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
@@ -1253,51 +1295,41 @@ export default function HomePage() {
   // ═══════════════════════════════════
   if (phase === 'friend_category') {
     return (
-      <div className="min-h-screen">
-        <Nav user={user} onLogout={logout} />
-        <section className="pt-28 pb-16 px-6">
-          <div className="max-w-4xl mx-auto">
-            <button onClick={() => { setPhase('home'); setMatchType('online') }} className="flex items-center gap-2 text-sm text-kk-text-muted hover:text-gold transition-colors mb-8">
+      <div className="min-h-screen bg-cover bg-center" style={{ backgroundImage: 'url(/img/categories/escolha-batalha.jpg)' }}>
+        <div className="min-h-screen bg-black/60 backdrop-blur-sm">
+          <div className="pt-6 px-5">
+            <button onClick={() => { setPhase('home'); setMatchType('online') }} className="flex items-center gap-2 text-sm text-white/70 hover:text-amber-400 transition-colors mb-6">
               <span>←</span> Voltar
             </button>
-
-            <div className="text-center mb-10">
-              <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-gold/20 to-sage-light flex items-center justify-center mx-auto mb-4">
-                <span className="text-5xl">👥</span>
-              </div>
-              <h2 className="font-serif text-heading">Desafiar Amigo</h2>
-              <p className="text-sm text-kk-text-muted mt-2">Escolha a categoria do desafio</p>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
-              {CATEGORIES.map((cat, i) => (
-                <button
-                  key={cat.key}
-                  onClick={() => handleSelectCategory(cat.key)}
-                  className="premium-card group text-left p-0 cursor-pointer"
-                  style={{ animationDelay: `${i * 0.08}s` }}
-                >
-                  <div className="p-6 pb-5">
-                    <div className="w-14 h-14 rounded-2xl bg-sage-light flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-500">
-                      <span className="text-3xl">{cat.emoji}</span>
-                    </div>
-                    <h3 className="font-serif text-xl font-normal text-kk-text mb-1">{cat.label}</h3>
-                    <p className="text-xs text-kk-text-muted font-light">{cat.desc}</p>
-                  </div>
-                  <div className="px-6 py-3 border-t border-gold-muted flex items-center justify-between">
-                    <span className="flex items-center gap-1.5 text-xs text-kk-text-muted">
-                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                      {cat.online} online
-                    </span>
-                    <span className="text-gold text-xs font-medium tracking-wide group-hover:translate-x-1 transition-transform">
-                      Escolher →
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
           </div>
-        </section>
+
+          <div className="text-center mb-8 px-6">
+            <span className="text-5xl">👥</span>
+            <h2 className="text-white text-2xl font-bold mt-3" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>Desafiar Amigo</h2>
+            <p className="text-white/60 text-sm mt-1">Escolha a categoria do desafio</p>
+          </div>
+
+          <div className="px-5 pb-10 grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-3xl mx-auto">
+            {CATEGORIES.map((cat, i) => (
+              <button
+                key={cat.key}
+                onClick={() => handleSelectCategory(cat.key)}
+                className="group relative overflow-hidden rounded-2xl border border-white/15 bg-black/30 backdrop-blur-sm hover:border-amber-400/50 active:scale-95 transition-all duration-300"
+              >
+                <div className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity" style={{ backgroundImage: `url(${cat.img})` }} />
+                <div className="relative p-5 text-center">
+                  <span className="text-3xl">{cat.emoji}</span>
+                  <h3 className="text-white font-semibold text-base mt-2">{cat.label}</h3>
+                  <p className="text-white/50 text-[11px] mt-1">{cat.desc}</p>
+                  <div className="mt-3 flex items-center justify-center gap-1.5 text-xs text-white/50">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                    {cat.online} online
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     )
   }
@@ -1307,44 +1339,42 @@ export default function HomePage() {
   // ═══════════════════════════════════
   if (phase === 'subcategory') {
     const subs = SUBCATEGORIES[selectedCat] || []
+    const catBg = CATEGORIES.find(c => c.key === selectedCat)?.img || '/img/arena-bg.jpg'
     return (
-      <div className="min-h-screen">
-        <Nav user={user} onLogout={logout} />
-        <section className="pt-28 pb-16 px-6">
-          <div className="max-w-4xl mx-auto">
-            <button onClick={() => setPhase(matchType === 'friend' ? 'friend_category' : 'home')} className="flex items-center gap-2 text-sm text-kk-text-muted hover:text-gold transition-colors mb-8">
+      <div className="min-h-screen bg-cover bg-center" style={{ backgroundImage: `url(${catBg})` }}>
+        <div className="min-h-screen bg-black/60 backdrop-blur-sm">
+          <div className="pt-6 px-5">
+            <button onClick={() => setPhase(matchType === 'friend' ? 'friend_category' : 'home')} className="flex items-center gap-2 text-sm text-white/70 hover:text-amber-400 transition-colors mb-6">
               <span>←</span> Voltar
             </button>
-
-            <div className="text-center mb-10">
-              {matchType === 'friend' && (
-                <span className="inline-block px-3 py-1 rounded-full bg-gold/10 text-gold text-xs font-medium mb-3">👥 Modo Amigo</span>
-              )}
-              <div className="w-20 h-20 rounded-3xl bg-sage-light flex items-center justify-center mx-auto mb-4">
-                <span className="text-5xl">{catInfo?.emoji}</span>
-              </div>
-              <h2 className="font-serif text-heading">{catInfo?.label}</h2>
-              <p className="text-sm text-kk-text-muted mt-2">Escolha sua modalidade</p>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {subs.map((sub, i) => (
-                <button
-                  key={sub.key}
-                  onClick={() => handleSelectSubcategory(sub.key)}
-                  className="premium-card group text-center p-5 cursor-pointer hover:border-gold transition-all duration-300"
-                  style={{ animationDelay: `${i * 0.05}s` }}
-                >
-                  <div className="w-14 h-14 rounded-2xl bg-sage-light flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-500">
-                    <span className="text-3xl">{sub.emoji}</span>
-                  </div>
-                  <h3 className="font-serif text-base font-normal text-kk-text mb-1">{sub.label}</h3>
-                  <p className="text-[11px] text-kk-text-muted font-light leading-relaxed">{sub.desc}</p>
-                </button>
-              ))}
-            </div>
           </div>
-        </section>
+
+          <div className="text-center mb-8 px-6">
+            {matchType === 'friend' && (
+              <span className="inline-block px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-medium mb-3">👥 Modo Amigo</span>
+            )}
+            <span className="text-5xl">{catInfo?.emoji}</span>
+            <h2 className="text-white text-2xl font-bold mt-3" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>{catInfo?.label}</h2>
+            <p className="text-white/60 text-sm mt-1">Escolha sua modalidade</p>
+          </div>
+
+          <div className="px-5 pb-10 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-w-4xl mx-auto">
+            {subs.map((sub, i) => (
+              <button
+                key={sub.key}
+                onClick={() => handleSelectSubcategory(sub.key)}
+                className="group rounded-2xl border border-white/15 bg-black/30 backdrop-blur-sm p-5 text-center hover:border-amber-400/50 active:scale-95 transition-all duration-300"
+                style={{ animationDelay: `${i * 0.04}s` }}
+              >
+                <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                  <span className="text-2xl">{sub.emoji}</span>
+                </div>
+                <h3 className="text-white font-semibold text-sm mb-1">{sub.label}</h3>
+                <p className="text-white/40 text-[10px] leading-relaxed">{sub.desc}</p>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     )
   }
@@ -1354,99 +1384,85 @@ export default function HomePage() {
   // ═══════════════════════════════════
   if (phase === 'mode') {
     const modes = getChallengeModes(selectedCat)
+    const catBg = CATEGORIES.find(c => c.key === selectedCat)?.img || '/img/arena-bg.jpg'
     return (
-      <div className="min-h-screen">
-        <Nav user={user} onLogout={logout} />
-        <section className="pt-28 pb-16 px-6">
-          <div className="max-w-3xl mx-auto">
-            <button onClick={() => setPhase('subcategory')} className="flex items-center gap-2 text-sm text-kk-text-muted hover:text-gold transition-colors mb-8">
+      <div className="min-h-screen bg-cover bg-center" style={{ backgroundImage: `url(${catBg})` }}>
+        <div className="min-h-screen bg-black/65 backdrop-blur-sm">
+          <div className="pt-6 px-5">
+            <button onClick={() => setPhase('subcategory')} className="flex items-center gap-2 text-sm text-white/70 hover:text-amber-400 transition-colors mb-6">
               <span>←</span> Voltar
             </button>
+          </div>
 
-            <div className="text-center mb-10">
-              {matchType === 'friend' && (
-                <span className="inline-block px-3 py-1 rounded-full bg-gold/10 text-gold text-xs font-medium mb-3">👥 Modo Amigo</span>
-              )}
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <div className="w-14 h-14 rounded-2xl bg-sage-light flex items-center justify-center">
-                  <span className="text-3xl">{catInfo?.emoji}</span>
-                </div>
-                <span className="text-kk-text-muted text-xl">→</span>
-                <div className="w-14 h-14 rounded-2xl bg-beige flex items-center justify-center">
-                  <span className="text-3xl">{subcatInfo?.emoji}</span>
-                </div>
-              </div>
-              <h2 className="font-serif text-heading">{subcatInfo?.label}</h2>
-              <p className="text-sm text-kk-text-muted mt-2">Escolha o modo de desafio</p>
+          <div className="text-center mb-8 px-6">
+            {matchType === 'friend' && (
+              <span className="inline-block px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-medium mb-3">👥 Modo Amigo</span>
+            )}
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <span className="text-3xl">{catInfo?.emoji}</span>
+              <span className="text-white/40 text-lg">→</span>
+              <span className="text-3xl">{subcatInfo?.emoji}</span>
             </div>
+            <h2 className="text-white text-2xl font-bold" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>{subcatInfo?.label}</h2>
+            <p className="text-white/60 text-sm mt-1">Escolha o modo de desafio</p>
+          </div>
 
-            {/* Modos clássicos */}
-            <div className="mb-6">
-              <p className="sec-label mb-4">Modos Clássicos</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {modes.filter(m => CHALLENGE_MODES._default.some(d => d.key === m.key)).map((mode, i) => (
-                  <button
-                    key={mode.key}
-                    onClick={() => handleSelectMode(mode.key)}
-                    className="premium-card group text-left p-5 cursor-pointer hover:border-gold transition-all duration-300"
-                    style={{ animationDelay: `${i * 0.06}s` }}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-sage-light flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-500">
-                        <span className="text-2xl">{mode.emoji}</span>
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-serif text-lg font-normal text-kk-text">{mode.label}</h3>
-                        <p className="text-xs text-kk-text-muted font-light mt-0.5">{mode.desc}</p>
-                        <div className="flex items-center gap-3 mt-2">
-                          <span className="text-[10px] text-gold bg-gold/10 px-2 py-0.5 rounded-full">{mode.players} jogadores</span>
-                          <span className="text-[10px] text-kk-text-muted">{mode.duration}</span>
-                        </div>
-                      </div>
-                      <span className="text-gold text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                        Jogar →
-                      </span>
+          <div className="px-5 pb-10 max-w-3xl mx-auto">
+            <p className="text-white/50 text-xs uppercase tracking-widest mb-3">Modos Clássicos</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+              {modes.filter(m => CHALLENGE_MODES._default.some(d => d.key === m.key)).map((mode, i) => (
+                <button
+                  key={mode.key}
+                  onClick={() => handleSelectMode(mode.key)}
+                  className="group rounded-2xl border border-white/15 bg-black/30 backdrop-blur-sm p-4 text-left hover:border-amber-400/50 active:scale-95 transition-all duration-300"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
+                      <span className="text-xl">{mode.emoji}</span>
                     </div>
-                  </button>
-                ))}
-              </div>
+                    <div className="flex-1">
+                      <h3 className="text-white font-semibold text-sm">{mode.label}</h3>
+                      <p className="text-white/40 text-[11px] mt-0.5">{mode.desc}</p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="text-[10px] text-amber-300 bg-amber-400/15 px-2 py-0.5 rounded-full">{mode.players} jogadores</span>
+                        <span className="text-[10px] text-white/40">{mode.duration}</span>
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              ))}
             </div>
 
-            {/* Modos divertidos (se existirem) */}
             {modes.filter(m => !CHALLENGE_MODES._default.some(d => d.key === m.key)).length > 0 && (
-              <div>
-                <p className="sec-label mb-4">Modos Divertidos</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <>
+                <p className="text-white/50 text-xs uppercase tracking-widest mb-3">Modos Divertidos</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {modes.filter(m => !CHALLENGE_MODES._default.some(d => d.key === m.key)).map((mode, i) => (
                     <button
                       key={mode.key}
                       onClick={() => handleSelectMode(mode.key)}
-                      className="premium-card group text-left p-5 cursor-pointer hover:border-gold transition-all duration-300 border-dashed"
-                      style={{ animationDelay: `${i * 0.06}s` }}
+                      className="group rounded-2xl border border-dashed border-white/15 bg-black/30 backdrop-blur-sm p-4 text-left hover:border-amber-400/50 active:scale-95 transition-all duration-300"
                     >
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-beige flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-500">
-                          <span className="text-2xl">{mode.emoji}</span>
+                      <div className="flex items-start gap-3">
+                        <div className="w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
+                          <span className="text-xl">{mode.emoji}</span>
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-serif text-lg font-normal text-kk-text">{mode.label}</h3>
-                          <p className="text-xs text-kk-text-muted font-light mt-0.5">{mode.desc}</p>
-                          <div className="flex items-center gap-3 mt-2">
-                            <span className="text-[10px] text-gold bg-gold/10 px-2 py-0.5 rounded-full">{mode.players} jogadores</span>
-                            <span className="text-[10px] text-kk-text-muted">{mode.duration}</span>
+                          <h3 className="text-white font-semibold text-sm">{mode.label}</h3>
+                          <p className="text-white/40 text-[11px] mt-0.5">{mode.desc}</p>
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className="text-[10px] text-amber-300 bg-amber-400/15 px-2 py-0.5 rounded-full">{mode.players} jogadores</span>
+                            <span className="text-[10px] text-white/40">{mode.duration}</span>
                           </div>
                         </div>
-                        <span className="text-gold text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                          Jogar →
-                        </span>
                       </div>
                     </button>
                   ))}
                 </div>
-              </div>
+              </>
             )}
           </div>
-        </section>
+        </div>
       </div>
     )
   }
@@ -1455,69 +1471,54 @@ export default function HomePage() {
   // PHASE: STAKE
   // ═══════════════════════════════════
   if (phase === 'stake') {
+    const catBg = CATEGORIES.find(c => c.key === selectedCat)?.img || '/img/arena-bg.jpg'
     return (
-      <div className="min-h-screen">
-        <Nav user={user} onLogout={logout} />
-        <section className="pt-28 pb-16 px-6">
-          <div className="max-w-lg mx-auto">
-            <button onClick={() => selectedMode ? setPhase('mode') : selectedSubcat ? setPhase('subcategory') : setPhase('home')} className="flex items-center gap-2 text-sm text-kk-text-muted hover:text-gold transition-colors mb-8">
+      <div className="min-h-screen bg-cover bg-center" style={{ backgroundImage: `url(${catBg})` }}>
+        <div className="min-h-screen bg-black/65 backdrop-blur-sm">
+          <div className="pt-6 px-5">
+            <button onClick={() => selectedMode ? setPhase('mode') : selectedSubcat ? setPhase('subcategory') : setPhase('home')} className="flex items-center gap-2 text-sm text-white/70 hover:text-amber-400 transition-colors mb-6">
               <span>←</span> Voltar
             </button>
+          </div>
+          <div className="px-5 pb-10 max-w-lg mx-auto">
 
-            <div className="text-center mb-10">
+            <div className="text-center mb-8">
               {matchType === 'friend' && (
-                <span className="inline-block px-3 py-1 rounded-full bg-gold/10 text-gold text-xs font-medium mb-3">👥 Modo Amigo</span>
+                <span className="inline-block px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-medium mb-3">👥 Modo Amigo</span>
               )}
-              {/* Breadcrumb visual */}
-              <div className="flex items-center justify-center gap-2 mb-4 flex-wrap">
-                <div className="w-14 h-14 rounded-2xl bg-sage-light flex items-center justify-center">
-                  <span className="text-2xl">{catInfo?.emoji}</span>
-                </div>
-                {subcatInfo && (
-                  <>
-                    <span className="text-kk-text-muted text-lg">→</span>
-                    <div className="w-14 h-14 rounded-2xl bg-beige flex items-center justify-center">
-                      <span className="text-2xl">{subcatInfo.emoji}</span>
-                    </div>
-                  </>
-                )}
-                {modeInfo && (
-                  <>
-                    <span className="text-kk-text-muted text-lg">→</span>
-                    <div className="w-14 h-14 rounded-2xl bg-sage-light flex items-center justify-center">
-                      <span className="text-2xl">{modeInfo.emoji}</span>
-                    </div>
-                  </>
-                )}
+              <div className="flex items-center justify-center gap-2 mb-3 flex-wrap">
+                <span className="text-2xl">{catInfo?.emoji}</span>
+                {subcatInfo && (<><span className="text-white/40">→</span><span className="text-2xl">{subcatInfo.emoji}</span></>)}
+                {modeInfo && (<><span className="text-white/40">→</span><span className="text-2xl">{modeInfo.emoji}</span></>)}
               </div>
-              <h2 className="font-serif text-heading">
+              <h2 className="text-white text-2xl font-bold" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
                 {subcatInfo ? subcatInfo.label : catInfo?.label}
                 {modeInfo ? ` · ${modeInfo.label}` : ''}
               </h2>
-              <p className="text-sm text-kk-text-muted mt-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block mr-1.5 animate-pulse" />
+              <div className="flex items-center justify-center gap-1.5 text-white/50 text-xs mt-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
                 {catInfo?.online} jogadores online
-              </p>
+              </div>
             </div>
 
-            <div className="mb-8">
-              <p className="sec-label mb-4">Defina seu stake</p>
-              <div className="grid grid-cols-5 gap-3">
+            <div className="mb-6">
+              <p className="text-white/50 text-xs uppercase tracking-widest mb-3">Defina seu stake</p>
+              <div className="grid grid-cols-5 gap-2">
                 {STAKES.map(s => (
                   <button
                     key={s.amount}
                     onClick={() => setSelectedStake(s.amount)}
                     className={`rounded-2xl py-4 text-center transition-all duration-300 ${
                       selectedStake === s.amount
-                        ? 'bg-gold text-white shadow-gold scale-105'
-                        : 'glass-card hover:border-gold'
+                        ? 'bg-gradient-to-b from-amber-400 to-amber-600 text-white shadow-lg scale-105'
+                        : 'border border-white/15 bg-black/30 backdrop-blur-sm text-white hover:border-amber-400/50'
                     }`}
                   >
                     <span className="text-lg font-medium block">
                       {s.amount >= 1000 ? `${s.amount / 1000}k` : s.amount}
                     </span>
                     <span className={`text-[10px] uppercase tracking-wider block mt-1 ${
-                      selectedStake === s.amount ? 'text-white/80' : 'text-kk-text-muted'
+                      selectedStake === s.amount ? 'text-white/80' : 'text-white/40'
                     }`}>{s.tier}</span>
                   </button>
                 ))}
@@ -1526,33 +1527,33 @@ export default function HomePage() {
 
             {/* Friend code (shown when in friend mode) */}
             {matchType === 'friend' && (
-              <div className="glass-card rounded-2xl p-4 mb-5">
+              <div className="rounded-2xl border border-white/15 bg-black/30 backdrop-blur-sm p-4 mb-5">
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-lg">👥</span>
-                  <p className="text-sm font-medium text-kk-text">Desafio entre Amigos</p>
+                  <p className="text-sm font-medium text-white">Desafio entre Amigos</p>
                 </div>
                 <div className="flex items-center gap-3 mb-3">
                   <div className="flex-1">
-                    <p className="text-xs text-kk-text-muted mb-1.5">Seu código</p>
+                    <p className="text-xs text-white/50 mb-1.5">Seu código</p>
                     <div className="flex items-center gap-2">
-                      <div className="flex-1 bg-beige rounded-xl px-3 py-2 text-center font-mono text-base tracking-widest text-gold font-medium">
+                      <div className="flex-1 bg-white/10 rounded-xl px-3 py-2 text-center font-mono text-base tracking-widest text-amber-300 font-medium">
                         {(user?.id?.slice(0, 6) || 'ABC123').toUpperCase()}
                       </div>
                       <button
                         onClick={() => navigator.clipboard?.writeText((user?.id?.slice(0, 6) || 'ABC123').toUpperCase())}
-                        className="btn-outline text-xs py-2 px-3"
+                        className="text-xs text-amber-300 border border-amber-400/30 rounded-xl py-2 px-3 hover:bg-amber-400/10"
                       >Copiar</button>
                     </div>
                   </div>
                 </div>
-                <div className="divider mb-3" />
-                <p className="text-xs text-kk-text-muted mb-1.5">Código do amigo</p>
+                <div className="border-t border-white/10 mb-3" />
+                <p className="text-xs text-white/50 mb-1.5">Código do amigo</p>
                 <input
                   type="text"
                   placeholder="Cole o código aqui"
                   value={friendCode}
                   onChange={(e) => setFriendCode(e.target.value.toUpperCase())}
-                  className="w-full bg-beige rounded-xl px-3 py-2 text-center font-mono text-base tracking-widest text-kk-text placeholder:text-kk-text-muted/40 outline-none focus:ring-2 focus:ring-gold/30"
+                  className="w-full bg-white/10 rounded-xl px-3 py-2 text-center font-mono text-base tracking-widest text-white placeholder:text-white/30 outline-none focus:ring-2 focus:ring-amber-400/30"
                   maxLength={6}
                 />
               </div>
@@ -1560,37 +1561,37 @@ export default function HomePage() {
 
             {/* Mechanics preview */}
             {selectedSubcat && (
-              <div className="glass-card rounded-2xl p-4 mb-5">
-                <p className="sec-label mb-3">Como funciona este desafio</p>
+              <div className="rounded-2xl border border-white/15 bg-black/30 backdrop-blur-sm p-4 mb-5">
+                <p className="text-white/50 text-xs uppercase tracking-widest mb-3">Como funciona este desafio</p>
                 <div className="flex flex-wrap gap-2">
                   {mechanics.camera && (
-                    <span className="text-[11px] bg-sage-light text-kk-text px-3 py-1.5 rounded-full flex items-center gap-1.5">📷 Câmera ao vivo</span>
+                    <span className="text-[11px] bg-white/10 text-white/80 px-3 py-1.5 rounded-full">📷 Câmera ao vivo</span>
                   )}
                   {mechanics.screenRec && (
-                    <span className="text-[11px] bg-sage-light text-kk-text px-3 py-1.5 rounded-full flex items-center gap-1.5">🖥️ Gravação de tela</span>
+                    <span className="text-[11px] bg-white/10 text-white/80 px-3 py-1.5 rounded-full">🖥️ Gravação de tela</span>
                   )}
                   {mechanics.theme && (
-                    <span className="text-[11px] bg-sage-light text-kk-text px-3 py-1.5 rounded-full flex items-center gap-1.5">🎲 Tema sorteado</span>
+                    <span className="text-[11px] bg-white/10 text-white/80 px-3 py-1.5 rounded-full">🎲 Tema sorteado</span>
                   )}
                   {mechanics.timerMinutes > 0 && (
-                    <span className="text-[11px] bg-sage-light text-kk-text px-3 py-1.5 rounded-full flex items-center gap-1.5">⏱️ {mechanics.timerMinutes} min</span>
+                    <span className="text-[11px] bg-white/10 text-white/80 px-3 py-1.5 rounded-full">⏱️ {mechanics.timerMinutes} min</span>
                   )}
                   {mechanics.uploadResult && (
-                    <span className="text-[11px] bg-sage-light text-kk-text px-3 py-1.5 rounded-full flex items-center gap-1.5">📤 Upload resultado</span>
+                    <span className="text-[11px] bg-white/10 text-white/80 px-3 py-1.5 rounded-full">📤 Upload resultado</span>
                   )}
                   {mechanics.aiJudge && (
-                    <span className="text-[11px] bg-sage-light text-kk-text px-3 py-1.5 rounded-full flex items-center gap-1.5">🤖 IA analisa</span>
+                    <span className="text-[11px] bg-white/10 text-white/80 px-3 py-1.5 rounded-full">🤖 IA analisa</span>
                   )}
                   {mechanics.viewerJudge && (
-                    <span className="text-[11px] bg-sage-light text-kk-text px-3 py-1.5 rounded-full flex items-center gap-1.5">👀 Juízes votam</span>
+                    <span className="text-[11px] bg-white/10 text-white/80 px-3 py-1.5 rounded-full">👀 Juízes votam</span>
                   )}
                 </div>
                 {mechanics.tools && mechanics.tools.length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-gold-muted">
-                    <p className="text-[10px] text-kk-text-muted uppercase tracking-wider mb-2">Ferramentas permitidas</p>
+                  <div className="mt-3 pt-3 border-t border-white/10">
+                    <p className="text-[10px] text-white/40 uppercase tracking-wider mb-2">Ferramentas permitidas</p>
                     <div className="flex flex-wrap gap-1.5">
                       {mechanics.tools.map(tool => (
-                        <span key={tool} className="text-[10px] bg-beige text-kk-text px-2.5 py-1 rounded-full">{tool}</span>
+                        <span key={tool} className="text-[10px] bg-white/10 text-white/70 px-2.5 py-1 rounded-full">{tool}</span>
                       ))}
                     </div>
                   </div>
@@ -1598,10 +1599,10 @@ export default function HomePage() {
               </div>
             )}
 
-            <div className="glass-card rounded-2xl p-5 flex items-center justify-between mb-5">
+            <div className="rounded-2xl border border-white/15 bg-black/30 backdrop-blur-sm p-5 flex items-center justify-between mb-5">
               <div>
-                <p className="text-sm font-medium text-kk-text">Desafio ao vivo</p>
-                <p className="text-xs text-kk-text-muted mt-0.5">Câmera liga quando match acontecer</p>
+                <p className="text-sm font-medium text-white">Desafio ao vivo</p>
+                <p className="text-xs text-white/50 mt-0.5">Câmera liga quando match acontecer</p>
               </div>
               <button
                 onClick={() => setPreferLive(!preferLive)}
@@ -1611,30 +1612,35 @@ export default function HomePage() {
               </button>
             </div>
 
-            <div className="glass-card rounded-2xl p-5 mb-8">
-              <p className="sec-label mb-4">Se você vencer</p>
+            <div className="rounded-2xl border border-white/15 bg-black/30 backdrop-blur-sm p-5 mb-8">
+              <p className="text-white/50 text-xs uppercase tracking-widest mb-4">Se você vencer</p>
               <div className="space-y-2.5">
                 <div className="flex justify-between text-sm">
-                  <span className="text-kk-text-muted">Pool total</span>
-                  <span className="text-kk-text">R$ {pool.toFixed(2)}</span>
+                  <span className="text-white/50">Pool total</span>
+                  <span className="text-white">R$ {pool.toFixed(2)}</span>
                 </div>
-                <div className="divider" />
+                <div className="border-t border-white/10" />
                 <div className="flex justify-between text-sm">
-                  <span className="text-kk-text-muted">Você recebe (70%)</span>
-                  <span className="text-gold font-medium">R$ {winnerReceives}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-kk-text-muted">Fundo Regeneração (30%)</span>
-                  <span className="text-kk-text">R$ {fundAmount}</span>
+                  <span className="text-white/50">Você recebe (70%)</span>
+                  <span className="text-amber-300 font-medium">R$ {winnerReceives}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-kk-text-muted">VITA Bonus</span>
-                  <span className="text-gold font-medium">+{Math.floor(selectedStake * 0.75)} VITA</span>
+                  <span className="text-white/50">Fundo Regeneração (30%)</span>
+                  <span className="text-white">R$ {fundAmount}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-white/50">VITA Bonus</span>
+                  <span className="text-amber-300 font-medium">+{Math.floor(selectedStake * 0.75)} VITA</span>
                 </div>
               </div>
             </div>
 
-            <button onClick={handleSearch} disabled={apiLoading || (matchType === 'friend' && friendCode.length < 4)} className="btn-gold w-full py-4 text-base disabled:opacity-50">
+            <button
+              onClick={handleSearch}
+              disabled={apiLoading || (matchType === 'friend' && friendCode.length < 4)}
+              className="w-full py-4 text-base font-semibold rounded-2xl text-white disabled:opacity-50 active:scale-95 transition-all"
+              style={{ background: 'linear-gradient(135deg, #c9a96e 0%, #a0835a 50%, #c9a96e 100%)', boxShadow: '0 8px 32px rgba(160,130,80,0.4)' }}
+            >
               {apiLoading
                 ? 'Entrando na fila...'
                 : matchType === 'friend'
@@ -1642,7 +1648,7 @@ export default function HomePage() {
                   : `Buscar Desafiante — R$${selectedStake}`}
             </button>
           </div>
-        </section>
+        </div>
       </div>
     )
   }
