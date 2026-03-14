@@ -6,6 +6,7 @@ import { ChallengesService } from './challenges.service';
 import { SmartFeedService } from './smart-feed.service';
 import { MatchmakingService } from './matchmaking.service';
 import { UsersService } from '../users/users.service';
+import { ChallengesGateway } from './challenges.gateway';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { ChallengeCategory, ChallengeStatus } from '../../common/types';
@@ -17,6 +18,7 @@ export class ChallengesController {
     private readonly smartFeedService: SmartFeedService,
     private readonly matchmakingService: MatchmakingService,
     private readonly usersService: UsersService,
+    private readonly gateway: ChallengesGateway,
   ) {}
 
   // ============================================
@@ -152,5 +154,34 @@ export class ChallengesController {
   @Get(':id/participants')
   async getParticipants(@Param('id') id: string) {
     return this.challengesService.getParticipants(id);
+  }
+
+  // ============================================
+  // AI JUDGING — Analyze challenge evidence and determine winner
+  // POST /challenges/:id/judge  { frames: [base64...], subcategory, theme }
+  // ============================================
+
+  @Post(':id/judge')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async judgeChallenge(
+    @Param('id') id: string,
+    @CurrentUser('id') userId: string,
+    @Body() body: {
+      player1Evidence: { frames: string[]; screenRecording?: boolean; uploadedResult?: string };
+      player2Evidence: { frames: string[]; screenRecording?: boolean; uploadedResult?: string };
+      subcategory: string;
+      theme?: string;
+      challengeMode: string;
+      viewerVotes?: { player1: number; player2: number };
+    },
+  ) {
+    return this.challengesService.judgeWithAI(id, body);
+  }
+
+  // GET vote results for a challenge
+  @Get(':id/votes')
+  async getVotes(@Param('id') id: string) {
+    return this.gateway.getVoteResults(id);
   }
 }

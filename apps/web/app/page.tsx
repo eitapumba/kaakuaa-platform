@@ -592,7 +592,11 @@ export default function HomePage() {
   const { user, loading: authLoading, logout } = useAuth()
 
   // WebSocket real — conecta quando tiver user
-  const { matchData, searchingData, challengeStarted, clearMatch } = useSocket(user?.id)
+  const {
+    matchData, searchingData, challengeStarted, challengeCompleted, clearMatch,
+    voteUpdate, sendOffer, sendAnswer, sendIceCandidate, sendReady, setWebRTCCallbacks,
+    sendVote, watchChallenge, submitFrame,
+  } = useSocket(user?.id)
 
   const [phase, setPhase] = useState<Phase>('home')
   const [selectedCat, setSelectedCat] = useState('')
@@ -612,11 +616,23 @@ export default function HomePage() {
   const [hasVoted, setHasVoted] = useState(false)
   const [showUpload, setShowUpload] = useState(false)
   const [isScreenSharing, setIsScreenSharing] = useState(false)
+  const [isRecording, setIsRecording] = useState(false)
+  const [aiJudgment, setAiJudgment] = useState<any>(null)
+  const [judgingLoading, setJudgingLoading] = useState(false)
   const screenStreamRef = useRef<MediaStream | null>(null)
 
   // Camera refs for WebRTC
   const localVideoRef = useRef<HTMLVideoElement>(null)
+  const remoteVideoRef = useRef<HTMLVideoElement>(null)
   const localStreamRef = useRef<MediaStream | null>(null)
+  const peerConnectionRef = useRef<RTCPeerConnection | null>(null)
+
+  // Screen recording with MediaRecorder
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const recordedChunksRef = useRef<Blob[]>([])
+
+  // Frame capture for AI analysis
+  const capturedFramesRef = useRef<string[]>([])
 
   const catInfo = CATEGORIES.find(c => c.key === selectedCat)
   const pool = selectedStake * 2
@@ -700,10 +716,234 @@ export default function HomePage() {
     }
   }, [])
 
-  // Live timer + challenge timer
+  // ─── WebRTC Peer Connection ───
+  const ICE_SERVERS = [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' },
+    { urls: 'stun:stun2.l.google.com:19302' },
+  ]
+
+  const setupPeerConnection = useCallback((challengeId: string, opponentId: string, isInitiator: boolean) => {
+    const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS })
+    peerConnectionRef.current = pc
+
+    // Add local stream tracks to peer connection
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach(track => {
+        pc.addTrack(track, localStreamRef.current!)
+      })
+    }
+
+    // Handle incoming remote stream
+    pc.ontrack = (event) => {
+      console.log('[WebRTC] Remote track received')
+      if (remoteVideoRef.current && event.streams[0]) {
+        remoteVideoRef.current.srcObject = event.streams[0]
+      }
+    }
+
+    // ICE candidates
+    pc.onicecandidate = (event) => {
+      if (event.candidate) {
+        sendIceCandidate(challengeId, opponentId, event.candidate)
+      }
+    }
+
+    pc.onconnectionstatechange = () => {
+      console.log('[WebRTC] Connection state:', pc.connectionState)
+    }
+
+    // If initiator, create and send offer
+    if (isInitiator) {
+      pc.createOffer().then(offer => {
+        pc.setLocalDescription(offer)
+        sendOffer(challengeId, opponentId, offer)
+      })
+    }
+
+    return pc
+  }, [sendIceCandidate, sendOffer])
+
+  const closePeerConnection = useCallback(() => {
+    if (peerConnectionRef.current) {
+      peerConnectionRef.current.close()
+      peerConnectionRef.current = null
+    }
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.srcObject = null
+    }
+  }, [])
+
+  // Set WebRTC signaling callbacks
+  useEffect(() => {
+    if (!matchData) return
+
+    setWebRTCCallbacks({
+      onOffer: async (data: any) => {
+        // We received an offer — create answer
+        const pc = setupPeerConnection(data.challengeId, data.fromUserId, false)
+        await pc.setRemoteDescription(new RTCSessionDescription(data.sdp))
+        const answer = await pc.createAnswer()
+        await pc.setLocalDescription(answer)
+        sendAnswer(data.challengeId, data.fromUserId, answer)
+      },
+      onAnswer: async (data: any) => {
+        // We sent an offer and got answer back
+        if (peerConnectionRef.current) {
+          await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(data.sdp))
+        }
+      },
+      onIceCandidate: async (data: any) => {
+        if (peerConnectionRef.current && data.candidate) {
+          try {
+            await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(data.candidate))
+          } catch (err) {
+            console.error('[WebRTC] Error adding ICE candidate:', err)
+          }
+        }
+      },
+      onPeerReady: (data: any) => {
+        // Peer is ready — initiate WebRTC connection (we are the initiator)
+        if (matchData?.challengeId) {
+          setupPeerConnection(matchData.challengeId, data.userId, true)
+        }
+      },
+    })
+  }, [matchData, setWebRTCCallbacks, setupPeerConnection, sendAnswer])
+
+  // Update viewer votes from WebSocket
+  useEffect(() => {
+    if (voteUpdate && matchData) {
+      const participants = matchData ? [user?.id, matchData.opponent.id] : []
+      if (participants.length >= 2) {
+        setViewerVotes({
+          player1: voteUpdate.votes[participants[0] as string] || 0,
+          player2: voteUpdate.votes[participants[1] as string] || 0,
+        })
+      }
+    }
+  }, [voteUpdate, matchData, user?.id])
+
+  // ─── Screen Recording with MediaRecorder ───
+  const startRecording = useCallback(() => {
+    const streams: MediaStream[] = []
+    if (localStreamRef.current) streams.push(localStreamRef.current)
+    if (screenStreamRef.current) streams.push(screenStreamRef.current)
+    if (streams.length === 0) return
+
+    // Combine all tracks into one stream
+    const combinedStream = new MediaStream()
+    streams.forEach(s => s.getTracks().forEach(t => combinedStream.addTrack(t)))
+
+    try {
+      const recorder = new MediaRecorder(combinedStream, {
+        mimeType: MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm',
+      })
+      recordedChunksRef.current = []
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) recordedChunksRef.current.push(e.data)
+      }
+
+      recorder.start(1000) // Capture every second
+      mediaRecorderRef.current = recorder
+      setIsRecording(true)
+      console.log('[Recording] Started')
+    } catch (err) {
+      console.error('[Recording] Error:', err)
+    }
+  }, [])
+
+  const stopRecording = useCallback(() => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop()
+      setIsRecording(false)
+      console.log('[Recording] Stopped —', recordedChunksRef.current.length, 'chunks')
+    }
+  }, [])
+
+  // ─── Frame Capture for AI Analysis ───
+  const captureFrame = useCallback(() => {
+    if (!localVideoRef.current) return null
+    const canvas = document.createElement('canvas')
+    const video = localVideoRef.current
+    canvas.width = video.videoWidth || 640
+    canvas.height = video.videoHeight || 480
+    const ctx = canvas.getContext('2d')
+    if (ctx) {
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.7)
+      capturedFramesRef.current.push(dataUrl)
+      return dataUrl
+    }
+    return null
+  }, [])
+
+  // Auto-capture frames during live phase (every 30 seconds)
+  useEffect(() => {
+    if (phase !== 'live') return
+    capturedFramesRef.current = [] // Reset
+
+    // Capture initial frame after 2 seconds
+    const initialCapture = setTimeout(() => captureFrame(), 2000)
+
+    // Then every 30 seconds
+    const interval = setInterval(() => {
+      captureFrame()
+    }, 30000)
+
+    return () => {
+      clearTimeout(initialCapture)
+      clearInterval(interval)
+    }
+  }, [phase, captureFrame])
+
+  // ─── AI Judging Handler ───
+  const requestAIJudging = useCallback(async () => {
+    if (!matchData?.challengeId) return
+
+    setJudgingLoading(true)
+    // Capture final frame
+    captureFrame()
+
+    try {
+      const result = await api.judgeChallenge(matchData.challengeId, {
+        player1Evidence: { frames: capturedFramesRef.current.slice(-3) },
+        player2Evidence: { frames: [] }, // Server-side would have the other player's frames
+        subcategory: selectedSubcat,
+        theme: challengeTheme || undefined,
+        challengeMode: selectedMode,
+        viewerVotes,
+      })
+      setAiJudgment(result)
+    } catch (err) {
+      console.error('[AI Judge] Error:', err)
+      // Fallback judgment based on viewer votes
+      setAiJudgment({
+        winner: viewerVotes.player1 >= viewerVotes.player2 ? 'player1' : 'player2',
+        confidence: 0.5,
+        analysis: 'Julgamento baseado nos votos dos espectadores',
+        method: 'fallback',
+      })
+    } finally {
+      setJudgingLoading(false)
+    }
+  }, [matchData, captureFrame, selectedSubcat, challengeTheme, selectedMode, viewerVotes])
+
+  // Live timer + challenge timer + WebRTC + Recording
   useEffect(() => {
     if (phase === 'live') {
       startCamera()
+
+      // Signal WebRTC readiness to opponent
+      if (matchData?.challengeId) {
+        sendReady(matchData.challengeId)
+        watchChallenge(matchData.challengeId)
+      }
+
+      // Start recording automatically
+      const recordTimeout = setTimeout(() => startRecording(), 2000)
+
       // Sortear tema se a mecânica pede
       if (mechanics.theme && !challengeTheme) {
         setChallengeTheme(pickRandomTheme())
@@ -718,7 +958,6 @@ export default function HomePage() {
         if (mechanics.timerMinutes > 0) {
           setTimerRemaining(prev => {
             if (prev <= 1) {
-              // Timer acabou — ir para judging
               clearInterval(timer)
               if (mechanics.uploadResult) {
                 setShowUpload(true)
@@ -729,23 +968,28 @@ export default function HomePage() {
           })
         }
       }, 1000)
-      // Simular votos de espectadores
+
+      // Simulate viewer votes when no real viewers connected (demo mode)
       const voteInterval = setInterval(() => {
-        if (mechanics.viewerJudge) {
+        if (mechanics.viewerJudge && !voteUpdate) {
           setViewerVotes(prev => ({
             player1: prev.player1 + Math.floor(Math.random() * 3),
             player2: prev.player2 + Math.floor(Math.random() * 3),
           }))
         }
       }, 4000)
+
       return () => {
         clearInterval(timer)
         clearInterval(voteInterval)
+        clearTimeout(recordTimeout)
         stopCamera()
         stopScreenShare()
+        stopRecording()
+        closePeerConnection()
       }
     }
-  }, [phase, startCamera, stopCamera, stopScreenShare, mechanics, challengeTheme, pickRandomTheme])
+  }, [phase, startCamera, stopCamera, stopScreenShare, stopRecording, closePeerConnection, mechanics, challengeTheme, pickRandomTheme, matchData, sendReady, watchChallenge, startRecording, voteUpdate])
 
   // ─── Handlers ───
   const handleSelectCategory = (key: string) => {
@@ -818,9 +1062,14 @@ export default function HomePage() {
 
   const handleEndChallenge = () => {
     stopCamera()
+    stopRecording()
+    closePeerConnection()
     clearMatch()
     setPhase('home')
     setElapsed(0)
+    setAiJudgment(null)
+    capturedFramesRef.current = []
+    recordedChunksRef.current = []
   }
 
   const formatTime = (s: number) =>
@@ -1551,11 +1800,30 @@ export default function HomePage() {
           )}
         </div>
 
-        {/* Opponent PiP */}
-        <div className="absolute top-20 right-4 w-24 h-32 rounded-2xl bg-beige border-2 border-gold/30 flex flex-col items-center justify-center shadow-card overflow-hidden">
-          <span className="text-3xl font-serif text-kk-text">{opponent.displayName[0]}</span>
-          <span className="text-[9px] text-kk-text-muted mt-1">{opponent.displayName}</span>
+        {/* Opponent PiP — real WebRTC video or fallback avatar */}
+        <div className="absolute top-20 right-4 w-28 h-36 rounded-2xl bg-beige border-2 border-gold/30 shadow-card overflow-hidden">
+          <video
+            ref={remoteVideoRef}
+            autoPlay
+            playsInline
+            className="w-full h-full object-cover"
+          />
+          {/* Fallback if no remote stream */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-beige/90">
+            <span className="text-3xl font-serif text-kk-text">{opponent.displayName[0]}</span>
+            <span className="text-[9px] text-kk-text-muted mt-1">{opponent.displayName}</span>
+          </div>
         </div>
+
+        {/* Recording indicator */}
+        {isRecording && (
+          <div className="absolute top-4 left-28 flex items-center gap-2">
+            <div className="flex items-center gap-1.5 bg-red-600/90 text-white text-xs px-3 py-1.5 rounded-full">
+              <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+              REC
+            </div>
+          </div>
+        )}
 
         {/* Challenge Timer (countdown) */}
         {mechanics.timerMinutes > 0 && (
@@ -1644,7 +1912,7 @@ export default function HomePage() {
               >📤</button>
             )}
             <button
-              onClick={() => { stopCamera(); stopScreenShare(); setChallengeTheme(''); setPhase('judging') }}
+              onClick={() => { captureFrame(); stopRecording(); stopCamera(); stopScreenShare(); closePeerConnection(); setChallengeTheme(''); setPhase('judging') }}
               className="rounded-full bg-live flex items-center justify-center text-xl hover:opacity-90 transition-opacity"
               style={{ width: 52, height: 52 }}
             >⏹️</button>
@@ -1665,7 +1933,11 @@ export default function HomePage() {
     const totalVotes = viewerVotes.player1 + viewerVotes.player2
     const p1Pct = totalVotes > 0 ? Math.round((viewerVotes.player1 / totalVotes) * 100) : 50
     const p2Pct = 100 - p1Pct
-    const aiVerdict = p1Pct >= 50 // IA concorda com maioria (simplificado)
+
+    // Auto-trigger AI judging when entering this phase
+    if (!aiJudgment && !judgingLoading) {
+      requestAIJudging()
+    }
 
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-6"
@@ -1673,7 +1945,9 @@ export default function HomePage() {
         <Nav user={user} onLogout={logout} />
 
         <span className="text-6xl block mb-6">⚖️</span>
-        <h2 className="font-serif text-heading mb-2">Avaliação em andamento</h2>
+        <h2 className="font-serif text-heading mb-2">
+          {aiJudgment ? 'Resultado da Avaliação' : 'Avaliação em andamento'}
+        </h2>
         <p className="text-sm text-kk-text-muted mb-10">
           {subcatInfo?.label || catInfo?.label} · {modeInfo?.label || ''}
         </p>
@@ -1710,25 +1984,62 @@ export default function HomePage() {
         <div className="w-full max-w-sm mb-8">
           <p className="sec-label mb-4">Análise da IA</p>
           <div className="glass-card rounded-2xl p-5">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-xl bg-sage-light flex items-center justify-center text-xl">🤖</div>
-              <div className="flex-1">
-                <p className="text-sm font-medium">Verificação automática</p>
-                <p className="text-xs text-kk-text-muted">Analisando performance e resultado...</p>
+            {judgingLoading ? (
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-sage-light flex items-center justify-center text-xl">🤖</div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Analisando com IA...</p>
+                  <p className="text-xs text-kk-text-muted">Processando frames capturados e votos</p>
+                </div>
+                <div className="w-8 h-8 rounded-full border-2 border-gold border-t-transparent animate-spin" />
               </div>
-              <div className="w-8 h-8 rounded-full border-2 border-gold border-t-transparent animate-spin" />
-            </div>
+            ) : aiJudgment ? (
+              <div>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-xl bg-sage-light flex items-center justify-center text-xl">🤖</div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">
+                      Veredicto: {aiJudgment.winner === 'player1' ? (user?.displayName || 'Você') : opponent.displayName}
+                    </p>
+                    <p className="text-xs text-kk-text-muted">
+                      Confiança: {Math.round((aiJudgment.confidence || 0.5) * 100)}%
+                    </p>
+                  </div>
+                  <span className="text-2xl">{aiJudgment.winner === 'player1' ? '🏆' : '🥈'}</span>
+                </div>
+                {aiJudgment.analysis && (
+                  <p className="text-xs text-kk-text-muted mt-2 leading-relaxed">{aiJudgment.analysis}</p>
+                )}
+                {aiJudgment.player1Score != null && (
+                  <div className="flex items-center gap-2 mt-3 text-xs">
+                    <span className="text-gold font-medium">Você: {aiJudgment.player1Score}pts</span>
+                    <span className="text-kk-text-muted">vs</span>
+                    <span className="text-kk-text font-medium">{opponent.displayName}: {aiJudgment.player2Score}pts</span>
+                  </div>
+                )}
+                <p className="text-[9px] text-kk-text-muted mt-2 uppercase tracking-wider">
+                  Método: {aiJudgment.method === 'ai_vision_analysis' ? 'Claude Vision + Votos' : 'Votos dos Espectadores'}
+                </p>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-sage-light flex items-center justify-center text-xl">🤖</div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Preparando análise...</p>
+                  <p className="text-xs text-kk-text-muted">{capturedFramesRef.current.length} frames capturados</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Finalize */}
         <button
-          onClick={() => {
-            setPhase('result')
-          }}
-          className="btn-gold py-3 px-10 text-sm"
+          onClick={() => setPhase('result')}
+          disabled={judgingLoading}
+          className="btn-gold py-3 px-10 text-sm disabled:opacity-50"
         >
-          Ver Resultado Final
+          {judgingLoading ? 'Aguarde a análise...' : 'Ver Resultado Final'}
         </button>
       </div>
     )
@@ -1738,7 +2049,7 @@ export default function HomePage() {
   // PHASE: RESULT
   // ═══════════════════════════════════
   if (phase === 'result') {
-    const won = viewerVotes.player1 >= viewerVotes.player2
+    const won = aiJudgment ? aiJudgment.winner === 'player1' : viewerVotes.player1 >= viewerVotes.player2
 
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-6"
@@ -1782,6 +2093,8 @@ export default function HomePage() {
               setViewerVotes({ player1: 0, player2: 0 })
               setChallengeTheme('')
               setTimerRemaining(0)
+              setAiJudgment(null)
+              capturedFramesRef.current = []
             }}
             className="btn-gold py-3 px-8"
           >

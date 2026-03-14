@@ -61,6 +61,16 @@ export const api = {
     fetchAPI(`/challenges/${id}/start`, { method: 'POST' }),
   submitEvidence: (id: string, evidence: any) =>
     fetchAPI(`/challenges/${id}/evidence`, { method: 'POST', body: JSON.stringify(evidence) }),
+  judgeChallenge: (id: string, data: {
+    player1Evidence: { frames: string[]; screenRecording?: boolean; uploadedResult?: string };
+    player2Evidence: { frames: string[]; screenRecording?: boolean; uploadedResult?: string };
+    subcategory: string;
+    theme?: string;
+    challengeMode: string;
+    viewerVotes?: { player1: number; player2: number };
+  }) =>
+    fetchAPI(`/challenges/${id}/judge`, { method: 'POST', body: JSON.stringify(data) }),
+  getVotes: (id: string) => fetchAPI(`/challenges/${id}/votes`),
 
   // VITA
   getBalance: () => fetchAPI('/vita/balance'),
