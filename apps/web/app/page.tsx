@@ -546,7 +546,7 @@ const STAKES = [
   { amount: 2000, tier: 'Diamond' },
 ]
 
-type Phase = 'home' | 'subcategory' | 'mode' | 'stake' | 'searching' | 'match' | 'live' | 'judging' | 'result' | 'create_challenge'
+type Phase = 'home' | 'friend_category' | 'subcategory' | 'mode' | 'stake' | 'searching' | 'match' | 'live' | 'judging' | 'result' | 'create_challenge'
 type MatchType = 'online' | 'friend'
 
 /* ─── Nav ─── */
@@ -663,6 +663,43 @@ export default function HomePage() {
     }
   }, [])
 
+  // Derived values (must be before useEffect)
+  const subcatInfo = SUBCATEGORIES[selectedCat]?.find(s => s.key === selectedSubcat)
+  const modeInfo = getChallengeModes(selectedCat).find(m => m.key === selectedMode)
+  const mechanics = CHALLENGE_MECHANICS[selectedSubcat] || { camera: true, screenRec: false, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true }
+
+  // Sortear tema
+  const pickRandomTheme = useCallback(() => {
+    const themes = THEME_POOLS[selectedSubcat]
+    if (themes && themes.length > 0) {
+      return themes[Math.floor(Math.random() * themes.length)]
+    }
+    return ''
+  }, [selectedSubcat])
+
+  // Screen sharing (must be declared before useEffect that references it)
+  const startScreenShare = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false })
+      screenStreamRef.current = stream
+      setIsScreenSharing(true)
+      stream.getVideoTracks()[0].onended = () => {
+        setIsScreenSharing(false)
+        screenStreamRef.current = null
+      }
+    } catch {
+      console.error('Screen share denied')
+    }
+  }, [])
+
+  const stopScreenShare = useCallback(() => {
+    if (screenStreamRef.current) {
+      screenStreamRef.current.getTracks().forEach(t => t.stop())
+      screenStreamRef.current = null
+      setIsScreenSharing(false)
+    }
+  }, [])
+
   // Live timer + challenge timer
   useEffect(() => {
     if (phase === 'live') {
@@ -736,42 +773,6 @@ export default function HomePage() {
     setSelectedMode(modeKey)
     setPhase('stake')
   }
-
-  const subcatInfo = SUBCATEGORIES[selectedCat]?.find(s => s.key === selectedSubcat)
-  const modeInfo = getChallengeModes(selectedCat).find(m => m.key === selectedMode)
-  const mechanics = CHALLENGE_MECHANICS[selectedSubcat] || { camera: true, screenRec: false, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true }
-
-  // Sortear tema
-  const pickRandomTheme = useCallback(() => {
-    const themes = THEME_POOLS[selectedSubcat]
-    if (themes && themes.length > 0) {
-      return themes[Math.floor(Math.random() * themes.length)]
-    }
-    return ''
-  }, [selectedSubcat])
-
-  // Screen sharing
-  const startScreenShare = useCallback(async () => {
-    try {
-      const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false })
-      screenStreamRef.current = stream
-      setIsScreenSharing(true)
-      stream.getVideoTracks()[0].onended = () => {
-        setIsScreenSharing(false)
-        screenStreamRef.current = null
-      }
-    } catch {
-      console.error('Screen share denied')
-    }
-  }, [])
-
-  const stopScreenShare = useCallback(() => {
-    if (screenStreamRef.current) {
-      screenStreamRef.current.getTracks().forEach(t => t.stop())
-      screenStreamRef.current = null
-      setIsScreenSharing(false)
-    }
-  }, [])
 
   const handleSearch = async () => {
     setPhase('searching')
@@ -921,7 +922,7 @@ export default function HomePage() {
               {CATEGORIES.map((cat, i) => (
                 <button
                   key={cat.key}
-                  onClick={() => handleSelectCategory(cat.key)}
+                  onClick={() => { setMatchType('online'); handleSelectCategory(cat.key) }}
                   className="premium-card group text-left p-0 cursor-pointer"
                   style={{ animationDelay: `${i * 0.08}s` }}
                 >
@@ -943,6 +944,30 @@ export default function HomePage() {
                   </div>
                 </button>
               ))}
+
+              {/* Desafiar Amigo — entrada principal no dashboard */}
+              <button
+                onClick={() => { setMatchType('friend'); setPhase('friend_category') }}
+                className="premium-card group text-left p-0 cursor-pointer border-2 border-dashed border-gold-muted hover:border-gold"
+                style={{ animationDelay: `${CATEGORIES.length * 0.08}s` }}
+              >
+                <div className="p-6 pb-5">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold/20 to-sage-light flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-500">
+                    <span className="text-3xl">👥</span>
+                  </div>
+                  <h3 className="font-serif text-xl font-normal text-kk-text mb-1">Desafiar Amigo</h3>
+                  <p className="text-xs text-kk-text-muted font-light">Escolha uma categoria e desafie um amigo</p>
+                </div>
+                <div className="px-6 py-3 border-t border-gold-muted flex items-center justify-between">
+                  <span className="flex items-center gap-1.5 text-xs text-kk-text-muted">
+                    <span className="text-sm">🔗</span>
+                    Via código
+                  </span>
+                  <span className="text-gold text-xs font-medium tracking-wide group-hover:translate-x-1 transition-transform">
+                    Desafiar →
+                  </span>
+                </div>
+              </button>
             </div>
 
             {/* Create custom challenge button */}
@@ -975,6 +1000,60 @@ export default function HomePage() {
   }
 
   // ═══════════════════════════════════
+  // PHASE: FRIEND CATEGORY SELECTION
+  // ═══════════════════════════════════
+  if (phase === 'friend_category') {
+    return (
+      <div className="min-h-screen">
+        <Nav user={user} onLogout={logout} />
+        <section className="pt-28 pb-16 px-6">
+          <div className="max-w-4xl mx-auto">
+            <button onClick={() => { setPhase('home'); setMatchType('online') }} className="flex items-center gap-2 text-sm text-kk-text-muted hover:text-gold transition-colors mb-8">
+              <span>←</span> Voltar
+            </button>
+
+            <div className="text-center mb-10">
+              <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-gold/20 to-sage-light flex items-center justify-center mx-auto mb-4">
+                <span className="text-5xl">👥</span>
+              </div>
+              <h2 className="font-serif text-heading">Desafiar Amigo</h2>
+              <p className="text-sm text-kk-text-muted mt-2">Escolha a categoria do desafio</p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
+              {CATEGORIES.map((cat, i) => (
+                <button
+                  key={cat.key}
+                  onClick={() => handleSelectCategory(cat.key)}
+                  className="premium-card group text-left p-0 cursor-pointer"
+                  style={{ animationDelay: `${i * 0.08}s` }}
+                >
+                  <div className="p-6 pb-5">
+                    <div className="w-14 h-14 rounded-2xl bg-sage-light flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-500">
+                      <span className="text-3xl">{cat.emoji}</span>
+                    </div>
+                    <h3 className="font-serif text-xl font-normal text-kk-text mb-1">{cat.label}</h3>
+                    <p className="text-xs text-kk-text-muted font-light">{cat.desc}</p>
+                  </div>
+                  <div className="px-6 py-3 border-t border-gold-muted flex items-center justify-between">
+                    <span className="flex items-center gap-1.5 text-xs text-kk-text-muted">
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                      {cat.online} online
+                    </span>
+                    <span className="text-gold text-xs font-medium tracking-wide group-hover:translate-x-1 transition-transform">
+                      Escolher →
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+      </div>
+    )
+  }
+
+  // ═══════════════════════════════════
   // PHASE: SUBCATEGORY
   // ═══════════════════════════════════
   if (phase === 'subcategory') {
@@ -984,11 +1063,14 @@ export default function HomePage() {
         <Nav user={user} onLogout={logout} />
         <section className="pt-28 pb-16 px-6">
           <div className="max-w-4xl mx-auto">
-            <button onClick={() => setPhase('home')} className="flex items-center gap-2 text-sm text-kk-text-muted hover:text-gold transition-colors mb-8">
+            <button onClick={() => setPhase(matchType === 'friend' ? 'friend_category' : 'home')} className="flex items-center gap-2 text-sm text-kk-text-muted hover:text-gold transition-colors mb-8">
               <span>←</span> Voltar
             </button>
 
             <div className="text-center mb-10">
+              {matchType === 'friend' && (
+                <span className="inline-block px-3 py-1 rounded-full bg-gold/10 text-gold text-xs font-medium mb-3">👥 Modo Amigo</span>
+              )}
               <div className="w-20 h-20 rounded-3xl bg-sage-light flex items-center justify-center mx-auto mb-4">
                 <span className="text-5xl">{catInfo?.emoji}</span>
               </div>
@@ -1033,6 +1115,9 @@ export default function HomePage() {
             </button>
 
             <div className="text-center mb-10">
+              {matchType === 'friend' && (
+                <span className="inline-block px-3 py-1 rounded-full bg-gold/10 text-gold text-xs font-medium mb-3">👥 Modo Amigo</span>
+              )}
               <div className="flex items-center justify-center gap-3 mb-4">
                 <div className="w-14 h-14 rounded-2xl bg-sage-light flex items-center justify-center">
                   <span className="text-3xl">{catInfo?.emoji}</span>
@@ -1131,6 +1216,9 @@ export default function HomePage() {
             </button>
 
             <div className="text-center mb-10">
+              {matchType === 'friend' && (
+                <span className="inline-block px-3 py-1 rounded-full bg-gold/10 text-gold text-xs font-medium mb-3">👥 Modo Amigo</span>
+              )}
               {/* Breadcrumb visual */}
               <div className="flex items-center justify-center gap-2 mb-4 flex-wrap">
                 <div className="w-14 h-14 rounded-2xl bg-sage-light flex items-center justify-center">
@@ -1187,62 +1275,39 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Match Type: Online vs Amigo */}
-            <div className="mb-6">
-              <p className="sec-label mb-3">Tipo de partida</p>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={() => { setMatchType('online'); setFriendCode('') }}
-                  className={`rounded-2xl py-4 px-4 text-center transition-all duration-300 ${
-                    matchType === 'online' ? 'bg-gold text-white shadow-gold' : 'glass-card hover:border-gold'
-                  }`}
-                >
-                  <span className="text-2xl block mb-1">🌐</span>
-                  <span className="text-sm font-medium block">Online</span>
-                  <span className={`text-[10px] block mt-0.5 ${matchType === 'online' ? 'text-white/70' : 'text-kk-text-muted'}`}>Contra qualquer pessoa</span>
-                </button>
-                <button
-                  onClick={() => setMatchType('friend')}
-                  className={`rounded-2xl py-4 px-4 text-center transition-all duration-300 ${
-                    matchType === 'friend' ? 'bg-gold text-white shadow-gold' : 'glass-card hover:border-gold'
-                  }`}
-                >
-                  <span className="text-2xl block mb-1">👥</span>
-                  <span className="text-sm font-medium block">Desafiar Amigo</span>
-                  <span className={`text-[10px] block mt-0.5 ${matchType === 'friend' ? 'text-white/70' : 'text-kk-text-muted'}`}>Convide pelo código</span>
-                </button>
-              </div>
-
-              {/* Friend code input */}
-              {matchType === 'friend' && (
-                <div className="mt-4 glass-card rounded-2xl p-4">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="flex-1">
-                      <p className="text-xs text-kk-text-muted mb-1.5">Seu código de convite</p>
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 bg-beige rounded-xl px-4 py-2.5 text-center font-mono text-lg tracking-widest text-gold font-medium">
-                          {(user?.id?.slice(0, 6) || 'ABC123').toUpperCase()}
-                        </div>
-                        <button
-                          onClick={() => navigator.clipboard?.writeText((user?.id?.slice(0, 6) || 'ABC123').toUpperCase())}
-                          className="btn-outline text-xs py-2.5 px-3"
-                        >Copiar</button>
+            {/* Friend code (shown when in friend mode) */}
+            {matchType === 'friend' && (
+              <div className="glass-card rounded-2xl p-4 mb-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-lg">👥</span>
+                  <p className="text-sm font-medium text-kk-text">Desafio entre Amigos</p>
+                </div>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="flex-1">
+                    <p className="text-xs text-kk-text-muted mb-1.5">Seu código</p>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 bg-beige rounded-xl px-3 py-2 text-center font-mono text-base tracking-widest text-gold font-medium">
+                        {(user?.id?.slice(0, 6) || 'ABC123').toUpperCase()}
                       </div>
+                      <button
+                        onClick={() => navigator.clipboard?.writeText((user?.id?.slice(0, 6) || 'ABC123').toUpperCase())}
+                        className="btn-outline text-xs py-2 px-3"
+                      >Copiar</button>
                     </div>
                   </div>
-                  <div className="divider mb-3" />
-                  <p className="text-xs text-kk-text-muted mb-1.5">Código do amigo</p>
-                  <input
-                    type="text"
-                    placeholder="Cole o código aqui"
-                    value={friendCode}
-                    onChange={(e) => setFriendCode(e.target.value.toUpperCase())}
-                    className="w-full bg-beige rounded-xl px-4 py-2.5 text-center font-mono text-lg tracking-widest text-kk-text placeholder:text-kk-text-muted/40 outline-none focus:ring-2 focus:ring-gold/30"
-                    maxLength={6}
-                  />
                 </div>
-              )}
-            </div>
+                <div className="divider mb-3" />
+                <p className="text-xs text-kk-text-muted mb-1.5">Código do amigo</p>
+                <input
+                  type="text"
+                  placeholder="Cole o código aqui"
+                  value={friendCode}
+                  onChange={(e) => setFriendCode(e.target.value.toUpperCase())}
+                  className="w-full bg-beige rounded-xl px-3 py-2 text-center font-mono text-base tracking-widest text-kk-text placeholder:text-kk-text-muted/40 outline-none focus:ring-2 focus:ring-gold/30"
+                  maxLength={6}
+                />
+              </div>
+            )}
 
             {/* Mechanics preview */}
             {selectedSubcat && (
