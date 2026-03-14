@@ -54,6 +54,11 @@ const CHALLENGE_MODES: Record<string, ChallengeMode[]> = {
     { key: 'mystery_box', emoji: '📦', label: 'Caixa Mistério', desc: 'Ingredientes surpresa', players: '2-4', duration: '30min' },
     { key: 'speed_cook', emoji: '⏱️', label: 'Speed Cook', desc: 'Cozinhe em 10 minutos', players: '2-4', duration: '10min' },
   ],
+  hero_journey_fun: [
+    { key: 'improv_scene', emoji: '🎭', label: 'Cena Improvisada', desc: 'Tema surpresa, atue na hora', players: '2-4', duration: '10min' },
+    { key: 'plot_twist', emoji: '🔄', label: 'Plot Twist', desc: 'Reviravolta obrigatória no roteiro', players: '2', duration: '20min' },
+    { key: 'one_take', emoji: '🎬', label: 'One Take', desc: 'Filme tudo em uma tomada só', players: '2-4', duration: '15min' },
+  ],
 }
 
 // Subcategorias por categoria
@@ -125,6 +130,18 @@ const SUBCATEGORIES: Record<string, Subcategory[]> = {
     { key: 'churrasco', emoji: '🥩', label: 'Churrasco', desc: 'Carnes e grelhados' },
     { key: 'mexicana', emoji: '🌮', label: 'Mexicana', desc: 'Tacos, burritos e molhos' },
     { key: 'drinks', emoji: '🍹', label: 'Drinks & Coquetéis', desc: 'Mixologia criativa' },
+  ],
+  hero_journey: [
+    { key: 'roteiro', emoji: '📝', label: 'Roteiro', desc: 'Escreva a história do zero' },
+    { key: 'atuacao', emoji: '🎭', label: 'Atuação', desc: 'Monólogos e cenas ao vivo' },
+    { key: 'direcao', emoji: '🎬', label: 'Direção', desc: 'Dirija um curta-metragem' },
+    { key: 'edicao', emoji: '✂️', label: 'Edição', desc: 'Monte o filme final' },
+    { key: 'documentario', emoji: '📹', label: 'Documentário', desc: 'Conte histórias reais' },
+    { key: 'animacao', emoji: '🖍️', label: 'Animação', desc: 'Crie vida com desenhos' },
+    { key: 'fotografia_cine', emoji: '📸', label: 'Fotografia Cine', desc: 'Composição e luz cinematográfica' },
+    { key: 'trilha_sonora', emoji: '🎵', label: 'Trilha Sonora', desc: 'Componha a música do filme' },
+    { key: 'vlog_challenge', emoji: '📱', label: 'Vlog Challenge', desc: 'Crie o melhor vlog' },
+    { key: 'podcast', emoji: '🎙️', label: 'Podcast', desc: 'Produza um episódio ao vivo' },
   ],
 }
 
@@ -391,6 +408,7 @@ const CATEGORIES = [
   { key: 'arts', emoji: '🎨', label: 'Artes', desc: 'Criatividade em desafio', online: 22 },
   { key: 'rap_battle', emoji: '🎤', label: 'Rap Battle', desc: 'Batalhas de rima', online: 9 },
   { key: 'culinary', emoji: '🍳', label: 'Culinária', desc: 'Duelos gastronômicos', online: 15 },
+  { key: 'hero_journey', emoji: '🎬', label: 'Jornada do Herói', desc: 'Do roteiro ao curta-metragem', online: 18 },
 ]
 
 const STAKES = [
