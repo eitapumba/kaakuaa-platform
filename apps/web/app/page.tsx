@@ -19,6 +19,133 @@ interface Subcategory {
   desc: string
 }
 
+// Mecânicas de cada subcategoria — o que o desafio precisa
+interface ChallengeMechanics {
+  camera: boolean        // Câmera do competidor ligada
+  screenRec: boolean     // Gravação de tela do celular/PC
+  theme: boolean         // Tema sorteado antes do desafio
+  timerMinutes: number   // Timer em minutos (0 = sem timer fixo)
+  uploadResult: boolean  // Competidor sobe resultado final
+  aiJudge: boolean       // IA analisa o resultado
+  viewerJudge: boolean   // Espectadores votam no vencedor
+  tools?: string[]       // Ferramentas permitidas/integradas
+}
+
+// Mecânicas padrão por subcategoria
+const CHALLENGE_MECHANICS: Record<string, ChallengeMechanics> = {
+  // ─── Jornada do Herói ───
+  roteiro:         { camera: true, screenRec: true, theme: true, timerMinutes: 30, uploadResult: true, aiJudge: true, viewerJudge: true, tools: ['Texto livre', 'Google Docs', 'Notas'] },
+  atuacao:         { camera: true, screenRec: false, theme: true, timerMinutes: 10, uploadResult: false, aiJudge: true, viewerJudge: true },
+  direcao:         { camera: true, screenRec: true, theme: true, timerMinutes: 60, uploadResult: true, aiJudge: true, viewerJudge: true },
+  edicao:          { camera: true, screenRec: true, theme: false, timerMinutes: 30, uploadResult: true, aiJudge: true, viewerJudge: true, tools: ['CapCut', 'Premiere', 'Final Cut', 'DaVinci'] },
+  documentario:    { camera: true, screenRec: true, theme: true, timerMinutes: 45, uploadResult: true, aiJudge: true, viewerJudge: true },
+  animacao:        { camera: true, screenRec: true, theme: true, timerMinutes: 30, uploadResult: true, aiJudge: true, viewerJudge: true, tools: ['Mão livre', 'Procreate', 'Photoshop', 'Illustrator', 'IA Generativa'] },
+  fotografia_cine: { camera: true, screenRec: false, theme: true, timerMinutes: 20, uploadResult: true, aiJudge: true, viewerJudge: true },
+  trilha_sonora:   { camera: true, screenRec: true, theme: true, timerMinutes: 20, uploadResult: true, aiJudge: true, viewerJudge: true, tools: ['Instrumentos', 'Beatbox → IA', 'GarageBand', 'Suno AI'] },
+  vlog_challenge:  { camera: true, screenRec: false, theme: true, timerMinutes: 15, uploadResult: true, aiJudge: true, viewerJudge: true },
+  podcast:         { camera: true, screenRec: false, theme: true, timerMinutes: 20, uploadResult: false, aiJudge: true, viewerJudge: true },
+  // ─── Sports ───
+  futebol:  { camera: true, screenRec: false, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true },
+  basquete: { camera: true, screenRec: false, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true },
+  tenis:    { camera: true, screenRec: false, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true },
+  natacao:  { camera: true, screenRec: false, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true },
+  corrida:  { camera: true, screenRec: false, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true },
+  mma:      { camera: true, screenRec: false, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true },
+  crossfit: { camera: true, screenRec: false, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true },
+  surf:     { camera: true, screenRec: false, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true },
+  skate:    { camera: true, screenRec: false, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true },
+  ciclismo: { camera: true, screenRec: false, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true },
+  volei:    { camera: true, screenRec: false, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true },
+  ginastica:{ camera: true, screenRec: false, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true },
+  // ─── E-Sports ───
+  fifa:           { camera: true, screenRec: true, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true },
+  lol:            { camera: true, screenRec: true, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true },
+  valorant:       { camera: true, screenRec: true, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true },
+  cs2:            { camera: true, screenRec: true, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true },
+  fortnite:       { camera: true, screenRec: true, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true },
+  rocket_league:  { camera: true, screenRec: true, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true },
+  street_fighter: { camera: true, screenRec: true, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true },
+  tekken:         { camera: true, screenRec: true, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true },
+  apex:           { camera: true, screenRec: true, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true },
+  cod:            { camera: true, screenRec: true, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true },
+  chess:          { camera: true, screenRec: true, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: false },
+  mario_kart:     { camera: true, screenRec: true, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true },
+  // ─── Artes ───
+  desenho:     { camera: true, screenRec: true, theme: true, timerMinutes: 20, uploadResult: true, aiJudge: true, viewerJudge: true, tools: ['Mão livre', 'Procreate', 'Photoshop', 'IA Generativa'] },
+  pintura:     { camera: true, screenRec: false, theme: true, timerMinutes: 30, uploadResult: true, aiJudge: true, viewerJudge: true },
+  fotografia:  { camera: true, screenRec: false, theme: true, timerMinutes: 15, uploadResult: true, aiJudge: true, viewerJudge: true },
+  musica:      { camera: true, screenRec: false, theme: true, timerMinutes: 15, uploadResult: false, aiJudge: true, viewerJudge: true },
+  danca:       { camera: true, screenRec: false, theme: true, timerMinutes: 5, uploadResult: false, aiJudge: true, viewerJudge: true },
+  grafite:     { camera: true, screenRec: false, theme: true, timerMinutes: 30, uploadResult: true, aiJudge: true, viewerJudge: true },
+  poesia:      { camera: true, screenRec: true, theme: true, timerMinutes: 15, uploadResult: true, aiJudge: true, viewerJudge: true },
+  escultura:   { camera: true, screenRec: false, theme: true, timerMinutes: 30, uploadResult: true, aiJudge: true, viewerJudge: true },
+  digital_art: { camera: true, screenRec: true, theme: true, timerMinutes: 20, uploadResult: true, aiJudge: true, viewerJudge: true, tools: ['Procreate', 'Photoshop', 'Illustrator', 'IA Generativa'] },
+  // ─── Rap Battle ───
+  freestyle:    { camera: true, screenRec: false, theme: true, timerMinutes: 3, uploadResult: false, aiJudge: true, viewerJudge: true },
+  escrito:      { camera: true, screenRec: true, theme: true, timerMinutes: 10, uploadResult: true, aiJudge: true, viewerJudge: true },
+  beatbox:      { camera: true, screenRec: false, theme: false, timerMinutes: 5, uploadResult: false, aiJudge: true, viewerJudge: true },
+  trap:         { camera: true, screenRec: true, theme: true, timerMinutes: 15, uploadResult: true, aiJudge: true, viewerJudge: true },
+  storytelling: { camera: true, screenRec: false, theme: true, timerMinutes: 5, uploadResult: false, aiJudge: true, viewerJudge: true },
+  roast:        { camera: true, screenRec: false, theme: false, timerMinutes: 5, uploadResult: false, aiJudge: true, viewerJudge: true },
+  // ─── Culinária ───
+  brasileira:  { camera: true, screenRec: false, theme: true, timerMinutes: 45, uploadResult: true, aiJudge: true, viewerJudge: true },
+  japonesa:    { camera: true, screenRec: false, theme: true, timerMinutes: 45, uploadResult: true, aiJudge: true, viewerJudge: true },
+  italiana:    { camera: true, screenRec: false, theme: true, timerMinutes: 45, uploadResult: true, aiJudge: true, viewerJudge: true },
+  confeitaria: { camera: true, screenRec: false, theme: true, timerMinutes: 60, uploadResult: true, aiJudge: true, viewerJudge: true },
+  vegana:      { camera: true, screenRec: false, theme: true, timerMinutes: 30, uploadResult: true, aiJudge: true, viewerJudge: true },
+  churrasco:   { camera: true, screenRec: false, theme: true, timerMinutes: 60, uploadResult: true, aiJudge: true, viewerJudge: true },
+  mexicana:    { camera: true, screenRec: false, theme: true, timerMinutes: 45, uploadResult: true, aiJudge: true, viewerJudge: true },
+  drinks:      { camera: true, screenRec: false, theme: true, timerMinutes: 15, uploadResult: true, aiJudge: true, viewerJudge: true },
+  // ─── Evolução Pessoal ───
+  meditacao:     { camera: true, screenRec: false, theme: false, timerMinutes: 10, uploadResult: false, aiJudge: true, viewerJudge: false },
+  leitura:       { camera: true, screenRec: false, theme: true, timerMinutes: 30, uploadResult: true, aiJudge: true, viewerJudge: true },
+  idiomas:       { camera: true, screenRec: false, theme: true, timerMinutes: 10, uploadResult: false, aiJudge: true, viewerJudge: true },
+  fitness:       { camera: true, screenRec: false, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true },
+  jejum:         { camera: true, screenRec: false, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: false },
+  gratidao:      { camera: true, screenRec: false, theme: true, timerMinutes: 5, uploadResult: true, aiJudge: true, viewerJudge: true },
+  cold_exposure: { camera: true, screenRec: false, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true },
+  habitos:       { camera: true, screenRec: false, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: false },
+  financas:      { camera: true, screenRec: true, theme: true, timerMinutes: 15, uploadResult: true, aiJudge: true, viewerJudge: true },
+}
+
+// Temas por subcategoria (pool de temas sorteados)
+const THEME_POOLS: Record<string, string[]> = {
+  roteiro: ['Recomeço', 'O último dia', 'Encontro inesperado', 'Carta para o futuro', 'Segredo de família', 'A viagem', 'Redenção', 'O estranho'],
+  atuacao: ['Despedida', 'Primeiro amor', 'Confissão', 'Notícia inesperada', 'Reencontro', 'Monólogo do vilão', 'Pedido de desculpas', 'Discurso de vitória'],
+  direcao: ['Suspense em 60s', 'Comédia do cotidiano', 'Drama familiar', 'Terror psicológico', 'Romance urbano', 'Documentário social'],
+  animacao: ['Metamorfose', 'Mundo invertido', 'A última árvore', 'Robô com sentimentos', 'Viagem no tempo', 'Cidade flutuante'],
+  trilha_sonora: ['Tensão', 'Nostalgia', 'Aventura épica', 'Romance', 'Mistério', 'Vitória', 'Tristeza bonita', 'Euforia'],
+  desenho: ['Retrato de emoção', 'Cidade do futuro', 'Natureza viva', 'Auto-retrato abstrato', 'Animal fantástico', 'Paisagem onírica'],
+  freestyle: ['Superação', 'Cidade grande', 'Amor e ódio', 'Dinheiro', 'Família', 'Futuro', 'Rua', 'Liberdade'],
+  storytelling: ['De onde eu vim', 'O dia que mudou tudo', 'Se eu pudesse voltar', 'A lição mais dura', 'O que ninguém sabe'],
+  brasileira: ['Feijoada completa', 'Moqueca baiana', 'Coxinha gourmet', 'Açaí na tigela', 'Pão de queijo recheado'],
+  japonesa: ['Temaki criativo', 'Ramen do zero', 'Gyoza artesanal', 'Onigiri fusion', 'Yakisoba especial'],
+  italiana: ['Carbonara autêntica', 'Pizza napolitana', 'Risoto criativo', 'Tiramisù', 'Gnocchi da nonna'],
+  drinks: ['Caipirinha twist', 'Mojito tropical', 'Shot criativo', 'Drink sem álcool', 'Coquetel autoral'],
+  fotografia: ['Luz e sombra', 'Reflexos', 'Minimalismo', 'Cores vibrantes', 'Retrato de rua', 'Macro natureza'],
+  poesia: ['Saudade', 'Amanhecer', 'Revolução', 'Silêncio', 'Cicatrizes', 'Liberdade'],
+  digital_art: ['Cyberpunk', 'Natureza futurista', 'Retrato surrealista', 'Abstrato emocional', 'Paisagem alien'],
+  vlog_challenge: ['Meu dia em 60s', 'Tour do meu quarto', 'O que como num dia', 'Desafio na rua', 'Reagindo a...'],
+  podcast: ['Tema surpresa', 'Debate quente', 'Entrevista improvável', 'Storytelling pessoal', 'Hot takes'],
+  leitura: ['Resuma em 2 min', 'Análise crítica', 'Conexão com a vida', 'Recomendação apaixonada'],
+  idiomas: ['Apresentação pessoal', 'Pedir comida', 'Contar uma história', 'Debate simples', 'Tradução ao vivo'],
+  gratidao: ['3 coisas de hoje', 'Carta de gratidão', 'Momento marcante', 'Pessoa especial'],
+  documentario: ['Minha rua', 'Uma profissão', 'Comida de rua', 'Antes e depois', 'Mini perfil humano'],
+  fotografia_cine: ['Golden hour', 'Silhueta', 'Close dramático', 'Plano aberto narrativo', 'Luz artificial criativa'],
+  pintura: ['Emoção em cores', 'Paisagem imaginária', 'Retrato expressionista', 'Abstrato livre'],
+  danca: ['Freestyle total', 'Coreografia em 3 min', 'Dança com objeto', 'Estilo surpresa'],
+  musica: ['Loop de 30s', 'Cover criativo', 'Composição original', 'Jam session tema'],
+  confeitaria: ['Bolo temático', 'Sobremesa em 30 min', 'Decoração criativa', 'Doce brasileiro gourmet'],
+  mexicana: ['Taco criativo', 'Guacamole twist', 'Burrito gourmet', 'Nachos premium'],
+  vegana: ['Hambúrguer vegano', 'Sobremesa sem leite', 'Bowl proteico', 'Comfort food plant-based'],
+  churrasco: ['Costela premium', 'Hambúrguer artesanal', 'Espeto criativo', 'Defumado especial'],
+  financas: ['Plano de economia', 'Investimento simulado', 'Orçamento pessoal', 'Análise de gastos'],
+  grafite: ['Tag original', 'Mural temático', 'Stencil art', 'Lettering criativo'],
+  escultura: ['Escultura de argila', 'Reciclagem artística', 'Miniatura detalhada', 'Escultura abstrata'],
+  trap: ['Beat do zero', 'Flow trap', 'Drill brasileiro', 'Autotune challenge'],
+  escrito: ['Punchline king', 'Rima multissilábica', '16 barras perfeitas', 'Storytelling rimado'],
+}
+
 interface ChallengeMode {
   key: string
   emoji: string
@@ -419,7 +546,8 @@ const STAKES = [
   { amount: 2000, tier: 'Diamond' },
 ]
 
-type Phase = 'home' | 'subcategory' | 'mode' | 'stake' | 'searching' | 'match' | 'live'
+type Phase = 'home' | 'subcategory' | 'mode' | 'stake' | 'searching' | 'match' | 'live' | 'judging' | 'result' | 'create_challenge'
+type MatchType = 'online' | 'friend'
 
 /* ─── Nav ─── */
 function Nav({ user, onLogout }: { user: any; onLogout: () => void }) {
@@ -475,6 +603,16 @@ export default function HomePage() {
   const [countdown, setCountdown] = useState(5)
   const [elapsed, setElapsed] = useState(0)
   const [apiLoading, setApiLoading] = useState(false)
+  const [matchType, setMatchType] = useState<MatchType>('online')
+  const [friendCode, setFriendCode] = useState('')
+  const [challengeTheme, setChallengeTheme] = useState('')
+  const [challengeTimer, setChallengeTimer] = useState(0)
+  const [timerRemaining, setTimerRemaining] = useState(0)
+  const [viewerVotes, setViewerVotes] = useState({ player1: 0, player2: 0 })
+  const [hasVoted, setHasVoted] = useState(false)
+  const [showUpload, setShowUpload] = useState(false)
+  const [isScreenSharing, setIsScreenSharing] = useState(false)
+  const screenStreamRef = useRef<MediaStream | null>(null)
 
   // Camera refs for WebRTC
   const localVideoRef = useRef<HTMLVideoElement>(null)
@@ -525,17 +663,52 @@ export default function HomePage() {
     }
   }, [])
 
-  // Live timer
+  // Live timer + challenge timer
   useEffect(() => {
     if (phase === 'live') {
       startCamera()
-      const timer = setInterval(() => setElapsed(prev => prev + 1), 1000)
+      // Sortear tema se a mecânica pede
+      if (mechanics.theme && !challengeTheme) {
+        setChallengeTheme(pickRandomTheme())
+      }
+      // Setar timer do desafio se tiver
+      if (mechanics.timerMinutes > 0) {
+        setChallengeTimer(mechanics.timerMinutes * 60)
+        setTimerRemaining(mechanics.timerMinutes * 60)
+      }
+      const timer = setInterval(() => {
+        setElapsed(prev => prev + 1)
+        if (mechanics.timerMinutes > 0) {
+          setTimerRemaining(prev => {
+            if (prev <= 1) {
+              // Timer acabou — ir para judging
+              clearInterval(timer)
+              if (mechanics.uploadResult) {
+                setShowUpload(true)
+              }
+              return 0
+            }
+            return prev - 1
+          })
+        }
+      }, 1000)
+      // Simular votos de espectadores
+      const voteInterval = setInterval(() => {
+        if (mechanics.viewerJudge) {
+          setViewerVotes(prev => ({
+            player1: prev.player1 + Math.floor(Math.random() * 3),
+            player2: prev.player2 + Math.floor(Math.random() * 3),
+          }))
+        }
+      }, 4000)
       return () => {
         clearInterval(timer)
+        clearInterval(voteInterval)
         stopCamera()
+        stopScreenShare()
       }
     }
-  }, [phase, startCamera, stopCamera])
+  }, [phase, startCamera, stopCamera, stopScreenShare, mechanics, challengeTheme, pickRandomTheme])
 
   // ─── Handlers ───
   const handleSelectCategory = (key: string) => {
@@ -566,6 +739,39 @@ export default function HomePage() {
 
   const subcatInfo = SUBCATEGORIES[selectedCat]?.find(s => s.key === selectedSubcat)
   const modeInfo = getChallengeModes(selectedCat).find(m => m.key === selectedMode)
+  const mechanics = CHALLENGE_MECHANICS[selectedSubcat] || { camera: true, screenRec: false, theme: false, timerMinutes: 0, uploadResult: false, aiJudge: true, viewerJudge: true }
+
+  // Sortear tema
+  const pickRandomTheme = useCallback(() => {
+    const themes = THEME_POOLS[selectedSubcat]
+    if (themes && themes.length > 0) {
+      return themes[Math.floor(Math.random() * themes.length)]
+    }
+    return ''
+  }, [selectedSubcat])
+
+  // Screen sharing
+  const startScreenShare = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false })
+      screenStreamRef.current = stream
+      setIsScreenSharing(true)
+      stream.getVideoTracks()[0].onended = () => {
+        setIsScreenSharing(false)
+        screenStreamRef.current = null
+      }
+    } catch {
+      console.error('Screen share denied')
+    }
+  }, [])
+
+  const stopScreenShare = useCallback(() => {
+    if (screenStreamRef.current) {
+      screenStreamRef.current.getTracks().forEach(t => t.stop())
+      screenStreamRef.current = null
+      setIsScreenSharing(false)
+    }
+  }, [])
 
   const handleSearch = async () => {
     setPhase('searching')
@@ -739,8 +945,18 @@ export default function HomePage() {
               ))}
             </div>
 
+            {/* Create custom challenge button */}
+            <div className="mt-8 flex justify-center">
+              <button
+                onClick={() => setPhase('create_challenge')}
+                className="btn-outline text-sm py-3 px-8 flex items-center gap-2"
+              >
+                🎯 Criar Desafio Customizado
+              </button>
+            </div>
+
             {/* Regeneration banner */}
-            <div className="mt-12 glass-card rounded-3xl p-8 flex items-center gap-6">
+            <div className="mt-8 glass-card rounded-3xl p-8 flex items-center gap-6">
               <div className="w-16 h-16 rounded-2xl bg-sage-light flex items-center justify-center text-3xl flex-shrink-0">
                 🌱
               </div>
@@ -971,6 +1187,103 @@ export default function HomePage() {
               </div>
             </div>
 
+            {/* Match Type: Online vs Amigo */}
+            <div className="mb-6">
+              <p className="sec-label mb-3">Tipo de partida</p>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => { setMatchType('online'); setFriendCode('') }}
+                  className={`rounded-2xl py-4 px-4 text-center transition-all duration-300 ${
+                    matchType === 'online' ? 'bg-gold text-white shadow-gold' : 'glass-card hover:border-gold'
+                  }`}
+                >
+                  <span className="text-2xl block mb-1">🌐</span>
+                  <span className="text-sm font-medium block">Online</span>
+                  <span className={`text-[10px] block mt-0.5 ${matchType === 'online' ? 'text-white/70' : 'text-kk-text-muted'}`}>Contra qualquer pessoa</span>
+                </button>
+                <button
+                  onClick={() => setMatchType('friend')}
+                  className={`rounded-2xl py-4 px-4 text-center transition-all duration-300 ${
+                    matchType === 'friend' ? 'bg-gold text-white shadow-gold' : 'glass-card hover:border-gold'
+                  }`}
+                >
+                  <span className="text-2xl block mb-1">👥</span>
+                  <span className="text-sm font-medium block">Desafiar Amigo</span>
+                  <span className={`text-[10px] block mt-0.5 ${matchType === 'friend' ? 'text-white/70' : 'text-kk-text-muted'}`}>Convide pelo código</span>
+                </button>
+              </div>
+
+              {/* Friend code input */}
+              {matchType === 'friend' && (
+                <div className="mt-4 glass-card rounded-2xl p-4">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex-1">
+                      <p className="text-xs text-kk-text-muted mb-1.5">Seu código de convite</p>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 bg-beige rounded-xl px-4 py-2.5 text-center font-mono text-lg tracking-widest text-gold font-medium">
+                          {(user?.id?.slice(0, 6) || 'ABC123').toUpperCase()}
+                        </div>
+                        <button
+                          onClick={() => navigator.clipboard?.writeText((user?.id?.slice(0, 6) || 'ABC123').toUpperCase())}
+                          className="btn-outline text-xs py-2.5 px-3"
+                        >Copiar</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="divider mb-3" />
+                  <p className="text-xs text-kk-text-muted mb-1.5">Código do amigo</p>
+                  <input
+                    type="text"
+                    placeholder="Cole o código aqui"
+                    value={friendCode}
+                    onChange={(e) => setFriendCode(e.target.value.toUpperCase())}
+                    className="w-full bg-beige rounded-xl px-4 py-2.5 text-center font-mono text-lg tracking-widest text-kk-text placeholder:text-kk-text-muted/40 outline-none focus:ring-2 focus:ring-gold/30"
+                    maxLength={6}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Mechanics preview */}
+            {selectedSubcat && (
+              <div className="glass-card rounded-2xl p-4 mb-5">
+                <p className="sec-label mb-3">Como funciona este desafio</p>
+                <div className="flex flex-wrap gap-2">
+                  {mechanics.camera && (
+                    <span className="text-[11px] bg-sage-light text-kk-text px-3 py-1.5 rounded-full flex items-center gap-1.5">📷 Câmera ao vivo</span>
+                  )}
+                  {mechanics.screenRec && (
+                    <span className="text-[11px] bg-sage-light text-kk-text px-3 py-1.5 rounded-full flex items-center gap-1.5">🖥️ Gravação de tela</span>
+                  )}
+                  {mechanics.theme && (
+                    <span className="text-[11px] bg-sage-light text-kk-text px-3 py-1.5 rounded-full flex items-center gap-1.5">🎲 Tema sorteado</span>
+                  )}
+                  {mechanics.timerMinutes > 0 && (
+                    <span className="text-[11px] bg-sage-light text-kk-text px-3 py-1.5 rounded-full flex items-center gap-1.5">⏱️ {mechanics.timerMinutes} min</span>
+                  )}
+                  {mechanics.uploadResult && (
+                    <span className="text-[11px] bg-sage-light text-kk-text px-3 py-1.5 rounded-full flex items-center gap-1.5">📤 Upload resultado</span>
+                  )}
+                  {mechanics.aiJudge && (
+                    <span className="text-[11px] bg-sage-light text-kk-text px-3 py-1.5 rounded-full flex items-center gap-1.5">🤖 IA analisa</span>
+                  )}
+                  {mechanics.viewerJudge && (
+                    <span className="text-[11px] bg-sage-light text-kk-text px-3 py-1.5 rounded-full flex items-center gap-1.5">👀 Juízes votam</span>
+                  )}
+                </div>
+                {mechanics.tools && mechanics.tools.length > 0 && (
+                  <div className="mt-3 pt-3 border-t border-gold-muted">
+                    <p className="text-[10px] text-kk-text-muted uppercase tracking-wider mb-2">Ferramentas permitidas</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {mechanics.tools.map(tool => (
+                        <span key={tool} className="text-[10px] bg-beige text-kk-text px-2.5 py-1 rounded-full">{tool}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="glass-card rounded-2xl p-5 flex items-center justify-between mb-5">
               <div>
                 <p className="text-sm font-medium text-kk-text">Desafio ao vivo</p>
@@ -1007,8 +1320,12 @@ export default function HomePage() {
               </div>
             </div>
 
-            <button onClick={handleSearch} disabled={apiLoading} className="btn-gold w-full py-4 text-base disabled:opacity-50">
-              {apiLoading ? 'Entrando na fila...' : `Buscar Desafiante — R$${selectedStake}`}
+            <button onClick={handleSearch} disabled={apiLoading || (matchType === 'friend' && friendCode.length < 4)} className="btn-gold w-full py-4 text-base disabled:opacity-50">
+              {apiLoading
+                ? 'Entrando na fila...'
+                : matchType === 'friend'
+                  ? friendCode.length >= 4 ? `Desafiar Amigo — R$${selectedStake}` : 'Digite o código do amigo'
+                  : `Buscar Desafiante — R$${selectedStake}`}
             </button>
           </div>
         </section>
@@ -1098,6 +1415,10 @@ export default function HomePage() {
   // PHASE: LIVE — with real WebRTC camera
   // ═══════════════════════════════════
   if (phase === 'live') {
+    const totalVotes = viewerVotes.player1 + viewerVotes.player2
+    const p1Pct = totalVotes > 0 ? Math.round((viewerVotes.player1 / totalVotes) * 100) : 50
+    const p2Pct = 100 - p1Pct
+
     return (
       <div className="min-h-screen bg-sage-dark relative">
         {/* YOUR CAMERA — real WebRTC */}
@@ -1106,12 +1427,12 @@ export default function HomePage() {
           autoPlay
           playsInline
           muted
-          className="w-full h-[70vh] object-cover bg-black"
+          className="w-full h-[60vh] object-cover bg-black"
         />
 
         {/* Fallback if no camera */}
         {!localStreamRef.current && (
-          <div className="absolute top-0 left-0 w-full h-[70vh] bg-gradient-to-b from-sage to-beige flex items-center justify-center">
+          <div className="absolute top-0 left-0 w-full h-[60vh] bg-gradient-to-b from-sage to-beige flex items-center justify-center">
             <div className="text-center">
               <span className="text-7xl opacity-40 block">{catInfo?.emoji}</span>
               <p className="text-sm text-kk-text-muted mt-4">Permitir acesso à câmera para transmitir ao vivo</p>
@@ -1120,48 +1441,369 @@ export default function HomePage() {
         )}
 
         {/* Live badge */}
-        <div className="absolute top-6 left-6 badge-live text-sm px-3 py-1.5">AO VIVO</div>
+        <div className="absolute top-4 left-4 badge-live text-sm px-3 py-1.5">AO VIVO</div>
 
-        {/* Viewers */}
-        <div className="absolute top-6 right-6 glass-card px-4 py-2 rounded-full text-sm text-kk-text">
-          👀 {Math.floor(Math.random() * 30) + 5}
+        {/* Screen recording indicator */}
+        {mechanics.screenRec && (
+          <div className="absolute top-4 left-28">
+            <button
+              onClick={isScreenSharing ? stopScreenShare : startScreenShare}
+              className={`text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all ${
+                isScreenSharing
+                  ? 'bg-red-500/90 text-white'
+                  : 'bg-white/20 backdrop-blur-sm text-white border border-white/20'
+              }`}
+            >
+              🖥️ {isScreenSharing ? 'Tela Compartilhada' : 'Compartilhar Tela'}
+            </button>
+          </div>
+        )}
+
+        {/* Theme banner */}
+        {mechanics.theme && challengeTheme && (
+          <div className="absolute top-14 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md text-white px-6 py-3 rounded-2xl text-center max-w-xs">
+            <p className="text-[10px] uppercase tracking-widest text-gold mb-1">Tema do Desafio</p>
+            <p className="font-serif text-lg">{challengeTheme}</p>
+          </div>
+        )}
+
+        {/* Viewers + Votes */}
+        <div className="absolute top-4 right-4 flex flex-col items-end gap-2">
+          <div className="bg-black/40 backdrop-blur-sm px-4 py-2 rounded-full text-sm text-white flex items-center gap-2">
+            👀 {Math.floor(Math.random() * 30) + 5 + totalVotes}
+          </div>
+          {mechanics.viewerJudge && totalVotes > 0 && (
+            <div className="bg-black/40 backdrop-blur-sm px-3 py-2 rounded-2xl text-xs text-white min-w-[120px]">
+              <p className="text-[9px] text-center uppercase tracking-wider text-gold/80 mb-1.5">Votos</p>
+              <div className="flex items-center gap-2">
+                <span className="text-gold font-medium">{p1Pct}%</span>
+                <div className="flex-1 h-1.5 bg-white/20 rounded-full overflow-hidden">
+                  <div className="h-full bg-gold rounded-full transition-all duration-700" style={{ width: `${p1Pct}%` }} />
+                </div>
+                <span className="text-white/70 font-medium">{p2Pct}%</span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Opponent PiP */}
-        <div className="absolute top-20 right-5 w-28 h-36 rounded-2xl bg-beige border-2 border-gold/30 flex flex-col items-center justify-center shadow-card overflow-hidden">
+        <div className="absolute top-20 right-4 w-24 h-32 rounded-2xl bg-beige border-2 border-gold/30 flex flex-col items-center justify-center shadow-card overflow-hidden">
           <span className="text-3xl font-serif text-kk-text">{opponent.displayName[0]}</span>
-          <span className="text-[10px] text-kk-text-muted mt-1">{opponent.displayName}</span>
+          <span className="text-[9px] text-kk-text-muted mt-1">{opponent.displayName}</span>
         </div>
 
-        {/* Controls */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-sage-dark via-sage-dark/95 to-transparent pt-20 pb-10 px-6">
-          <p className="font-serif text-5xl text-gold text-center">{formatTime(elapsed)}</p>
-          <p className="text-sm text-sage-light text-center mt-2">{catInfo?.label} · R${pool} pool</p>
+        {/* Challenge Timer (countdown) */}
+        {mechanics.timerMinutes > 0 && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-2">
+            <div className={`px-4 py-2 rounded-full text-lg font-mono font-bold ${
+              timerRemaining <= 60 ? 'bg-red-500/90 text-white animate-pulse' : 'bg-black/50 backdrop-blur-sm text-gold'
+            }`}>
+              ⏱️ {formatTime(timerRemaining)}
+            </div>
+          </div>
+        )}
 
-          <div className="flex justify-center gap-4 mt-8">
+        {/* Upload Result Modal */}
+        {showUpload && (
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-ivory rounded-3xl p-8 max-w-sm mx-4 text-center">
+              <span className="text-5xl block mb-4">⏰</span>
+              <h3 className="font-serif text-2xl mb-2">Tempo Esgotado!</h3>
+              <p className="text-sm text-kk-text-muted mb-6">Envie seu resultado final para avaliação</p>
+              <button
+                onClick={() => { setShowUpload(false); setPhase('judging') }}
+                className="btn-gold w-full py-3 mb-3"
+              >
+                📤 Enviar Resultado
+              </button>
+              <button
+                onClick={() => { setShowUpload(false); setPhase('judging') }}
+                className="btn-outline w-full py-3 text-sm"
+              >
+                Pular — usar gravação ao vivo
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Controls */}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-sage-dark via-sage-dark/95 to-transparent pt-16 pb-8 px-6">
+          {/* Timer / Elapsed */}
+          <div className="text-center mb-2">
+            <p className="font-serif text-4xl text-gold">{formatTime(elapsed)}</p>
+            <p className="text-xs text-sage-light mt-1">
+              {subcatInfo?.label || catInfo?.label} · {modeInfo?.label || ''} · R${pool} pool
+            </p>
+          </div>
+
+          {/* Tools info */}
+          {mechanics.tools && mechanics.tools.length > 0 && (
+            <div className="flex justify-center gap-1.5 mb-4 flex-wrap">
+              {mechanics.tools.map(tool => (
+                <span key={tool} className="text-[9px] bg-white/10 text-white/70 px-2 py-0.5 rounded-full">{tool}</span>
+              ))}
+            </div>
+          )}
+
+          <div className="flex justify-center gap-3 mt-4">
             <button
               onClick={() => {
                 const tracks = localStreamRef.current?.getVideoTracks()
                 if (tracks?.[0]) tracks[0].enabled = !tracks[0].enabled
               }}
-              className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-xl hover:bg-white/20 transition-colors"
+              className="w-13 h-13 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-xl hover:bg-white/20 transition-colors"
+              style={{ width: 52, height: 52 }}
             >📷</button>
             <button
               onClick={() => {
                 const tracks = localStreamRef.current?.getAudioTracks()
                 if (tracks?.[0]) tracks[0].enabled = !tracks[0].enabled
               }}
-              className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-xl hover:bg-white/20 transition-colors"
+              className="w-13 h-13 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-xl hover:bg-white/20 transition-colors"
+              style={{ width: 52, height: 52 }}
             >🎤</button>
+            {mechanics.screenRec && (
+              <button
+                onClick={isScreenSharing ? stopScreenShare : startScreenShare}
+                className={`rounded-full flex items-center justify-center text-xl transition-colors ${
+                  isScreenSharing ? 'bg-red-500/80 border border-red-400' : 'bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20'
+                }`}
+                style={{ width: 52, height: 52 }}
+              >🖥️</button>
+            )}
+            {mechanics.uploadResult && (
+              <button
+                onClick={() => setShowUpload(true)}
+                className="rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-xl hover:bg-white/20 transition-colors"
+                style={{ width: 52, height: 52 }}
+              >📤</button>
+            )}
             <button
-              onClick={handleEndChallenge}
-              className="w-14 h-14 rounded-full bg-live flex items-center justify-center text-xl hover:opacity-90 transition-opacity"
+              onClick={() => { stopCamera(); stopScreenShare(); setChallengeTheme(''); setPhase('judging') }}
+              className="rounded-full bg-live flex items-center justify-center text-xl hover:opacity-90 transition-opacity"
+              style={{ width: 52, height: 52 }}
             >⏹️</button>
-            <button className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-xl hover:bg-white/20 transition-colors">
-              💬
-            </button>
+            <button
+              className="rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-xl hover:bg-white/20 transition-colors"
+              style={{ width: 52, height: 52 }}
+            >💬</button>
           </div>
         </div>
+      </div>
+    )
+  }
+
+  // ═══════════════════════════════════
+  // PHASE: JUDGING — IA + Viewers decide
+  // ═══════════════════════════════════
+  if (phase === 'judging') {
+    const totalVotes = viewerVotes.player1 + viewerVotes.player2
+    const p1Pct = totalVotes > 0 ? Math.round((viewerVotes.player1 / totalVotes) * 100) : 50
+    const p2Pct = 100 - p1Pct
+    const aiVerdict = p1Pct >= 50 // IA concorda com maioria (simplificado)
+
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center px-6"
+           style={{ background: 'radial-gradient(circle at 50% 30%, #E9EDC9 0%, #FEFAE0 70%)' }}>
+        <Nav user={user} onLogout={logout} />
+
+        <span className="text-6xl block mb-6">⚖️</span>
+        <h2 className="font-serif text-heading mb-2">Avaliação em andamento</h2>
+        <p className="text-sm text-kk-text-muted mb-10">
+          {subcatInfo?.label || catInfo?.label} · {modeInfo?.label || ''}
+        </p>
+
+        {/* Viewer votes */}
+        {mechanics.viewerJudge && (
+          <div className="w-full max-w-sm mb-8">
+            <p className="sec-label mb-4">Votos dos Juízes (Espectadores)</p>
+            <div className="glass-card rounded-2xl p-5">
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-center">
+                  <div className="w-12 h-12 rounded-full border-2 border-gold bg-beige flex items-center justify-center text-xl font-serif mx-auto mb-1">
+                    {user?.displayName?.[0] || 'V'}
+                  </div>
+                  <p className="text-xs font-medium">{user?.displayName || 'Você'}</p>
+                </div>
+                <p className="font-serif text-2xl text-gold">{p1Pct}% — {p2Pct}%</p>
+                <div className="text-center">
+                  <div className="w-12 h-12 rounded-full border-2 border-tan bg-beige flex items-center justify-center text-xl font-serif mx-auto mb-1">
+                    {opponent.displayName[0]}
+                  </div>
+                  <p className="text-xs font-medium">{opponent.displayName}</p>
+                </div>
+              </div>
+              <div className="w-full h-3 bg-tan rounded-full overflow-hidden">
+                <div className="h-full bg-gold-gradient rounded-full transition-all duration-1000" style={{ width: `${p1Pct}%` }} />
+              </div>
+              <p className="text-[10px] text-kk-text-muted text-center mt-2">{totalVotes} votos</p>
+            </div>
+          </div>
+        )}
+
+        {/* AI Analysis */}
+        <div className="w-full max-w-sm mb-8">
+          <p className="sec-label mb-4">Análise da IA</p>
+          <div className="glass-card rounded-2xl p-5">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-xl bg-sage-light flex items-center justify-center text-xl">🤖</div>
+              <div className="flex-1">
+                <p className="text-sm font-medium">Verificação automática</p>
+                <p className="text-xs text-kk-text-muted">Analisando performance e resultado...</p>
+              </div>
+              <div className="w-8 h-8 rounded-full border-2 border-gold border-t-transparent animate-spin" />
+            </div>
+          </div>
+        </div>
+
+        {/* Finalize */}
+        <button
+          onClick={() => {
+            setPhase('result')
+          }}
+          className="btn-gold py-3 px-10 text-sm"
+        >
+          Ver Resultado Final
+        </button>
+      </div>
+    )
+  }
+
+  // ═══════════════════════════════════
+  // PHASE: RESULT
+  // ═══════════════════════════════════
+  if (phase === 'result') {
+    const won = viewerVotes.player1 >= viewerVotes.player2
+
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center px-6"
+           style={{ background: won
+             ? 'radial-gradient(circle at 50% 30%, #E9EDC9 0%, #FEFAE0 70%)'
+             : 'radial-gradient(circle at 50% 30%, #FAEDCD 0%, #FEFAE0 70%)'
+           }}>
+        <Nav user={user} onLogout={logout} />
+
+        <span className="text-7xl block mb-6">{won ? '🏆' : '🌱'}</span>
+        <h2 className="font-serif text-display mb-2">
+          {won ? 'Vitória!' : 'O Planeta Ganhou!'}
+        </h2>
+        <p className="text-sm text-kk-text-muted mb-8">
+          {won
+            ? `Você ganhou R$ ${(pool * 0.7).toFixed(2)} + ${Math.floor(selectedStake * 0.75)} VITA`
+            : `R$ ${(pool * 0.3).toFixed(2)} foram para regeneração ambiental`}
+        </p>
+
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-4 mb-10">
+          <div className="glass-card rounded-2xl p-4 text-center">
+            <p className="stat-num">{formatTime(elapsed)}</p>
+            <p className="text-[10px] text-kk-text-muted mt-1">Duração</p>
+          </div>
+          <div className="glass-card rounded-2xl p-4 text-center">
+            <p className="stat-num">{viewerVotes.player1 + viewerVotes.player2}</p>
+            <p className="text-[10px] text-kk-text-muted mt-1">Votos</p>
+          </div>
+          <div className="glass-card rounded-2xl p-4 text-center">
+            <p className="stat-num text-gold">{won ? `+R$${(pool * 0.7).toFixed(0)}` : `🌱 R$${(pool * 0.3).toFixed(0)}`}</p>
+            <p className="text-[10px] text-kk-text-muted mt-1">{won ? 'Ganhos' : 'Regeneração'}</p>
+          </div>
+        </div>
+
+        <div className="flex gap-4">
+          <button
+            onClick={() => {
+              setPhase('stake')
+              setElapsed(0)
+              setViewerVotes({ player1: 0, player2: 0 })
+              setChallengeTheme('')
+              setTimerRemaining(0)
+            }}
+            className="btn-gold py-3 px-8"
+          >
+            Jogar Novamente
+          </button>
+          <button
+            onClick={() => {
+              handleEndChallenge()
+              setViewerVotes({ player1: 0, player2: 0 })
+              setChallengeTheme('')
+              setTimerRemaining(0)
+            }}
+            className="btn-outline py-3 px-8"
+          >
+            Voltar ao Início
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // ═══════════════════════════════════
+  // PHASE: CREATE CHALLENGE — custom challenges
+  // ═══════════════════════════════════
+  if (phase === 'create_challenge') {
+    return (
+      <div className="min-h-screen">
+        <Nav user={user} onLogout={logout} />
+        <section className="pt-28 pb-16 px-6">
+          <div className="max-w-lg mx-auto">
+            <button onClick={() => setPhase('home')} className="flex items-center gap-2 text-sm text-kk-text-muted hover:text-gold transition-colors mb-8">
+              <span>←</span> Voltar
+            </button>
+
+            <div className="text-center mb-8">
+              <span className="text-5xl block mb-4">🎯</span>
+              <h2 className="font-serif text-heading">Criar Desafio Customizado</h2>
+              <p className="text-sm text-kk-text-muted mt-2">Crie seu próprio desafio para a comunidade</p>
+            </div>
+
+            <div className="space-y-4">
+              <div className="glass-card rounded-2xl p-5">
+                <label className="text-xs text-kk-text-muted uppercase tracking-wider block mb-2">Nome do Desafio</label>
+                <input type="text" placeholder="Ex: Quem faz mais embaixadinhas em 1 min" className="w-full bg-beige rounded-xl px-4 py-3 text-sm text-kk-text outline-none focus:ring-2 focus:ring-gold/30" />
+              </div>
+
+              <div className="glass-card rounded-2xl p-5">
+                <label className="text-xs text-kk-text-muted uppercase tracking-wider block mb-2">Categoria</label>
+                <div className="flex flex-wrap gap-2">
+                  {CATEGORIES.map(cat => (
+                    <button key={cat.key} className="text-xs bg-beige hover:bg-gold hover:text-white px-3 py-1.5 rounded-full transition-all">
+                      {cat.emoji} {cat.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="glass-card rounded-2xl p-5">
+                <label className="text-xs text-kk-text-muted uppercase tracking-wider block mb-2">Descrição e Regras</label>
+                <textarea placeholder="Descreva como funciona o desafio, regras e critérios de vitória..." className="w-full bg-beige rounded-xl px-4 py-3 text-sm text-kk-text outline-none focus:ring-2 focus:ring-gold/30 h-24 resize-none" />
+              </div>
+
+              <div className="glass-card rounded-2xl p-5">
+                <label className="text-xs text-kk-text-muted uppercase tracking-wider block mb-3">Mecânicas</label>
+                <div className="flex flex-wrap gap-2">
+                  {['📷 Câmera', '🖥️ Gravação de tela', '🎲 Tema sorteado', '⏱️ Timer', '📤 Upload resultado', '🤖 IA Analisa', '👀 Juízes votam'].map(m => (
+                    <button key={m} className="text-[11px] bg-sage-light hover:bg-gold hover:text-white px-3 py-1.5 rounded-full transition-all">
+                      {m}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="glass-card rounded-2xl p-5">
+                <label className="text-xs text-kk-text-muted uppercase tracking-wider block mb-2">Tempo limite (minutos)</label>
+                <input type="number" placeholder="10" className="w-full bg-beige rounded-xl px-4 py-3 text-sm text-kk-text outline-none focus:ring-2 focus:ring-gold/30" />
+              </div>
+
+              <button className="btn-gold w-full py-4 text-base">
+                Enviar para Aprovação
+              </button>
+              <p className="text-[10px] text-kk-text-muted text-center">
+                Desafios customizados passam por aprovação antes de ficar disponíveis para a comunidade
+              </p>
+            </div>
+          </div>
+        </section>
       </div>
     )
   }
