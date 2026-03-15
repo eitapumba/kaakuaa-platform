@@ -1201,8 +1201,8 @@ export default function HomePage() {
           />
         ))}
 
-        {/* Dark overlay for readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/20 z-10" />
+        {/* Subtle dark overlay — just enough for bottom UI */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10 z-10" />
 
         {/* Top bar: Logo + user info */}
         <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-5 py-4">
@@ -1210,7 +1210,7 @@ export default function HomePage() {
             src="/img/logo-jungle-games-transparent.png"
             alt="Jungle Games"
             className="h-10 w-auto cursor-pointer"
-            style={{ filter: 'brightness(0) invert(1) drop-shadow(0 2px 8px rgba(0,0,0,0.5))' }}
+            style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.4))' }}
             onClick={() => { setPhase('splash'); setCarouselIndex(0) }}
           />
           {user && (
@@ -1242,53 +1242,42 @@ export default function HomePage() {
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
         </button>
 
-        {/* Bottom content area */}
-        <div className="absolute bottom-0 left-0 right-0 z-20 px-6 pb-8 pt-20">
+        {/* Bottom content area — minimal */}
+        <div className="absolute bottom-0 left-0 right-0 z-20 px-6 pb-8 pt-16">
           <div className="max-w-lg mx-auto text-center">
-            {/* Category emoji */}
-            <div className="mb-3">
-              <span className="text-5xl sm:text-6xl drop-shadow-lg">{current.emoji}</span>
-            </div>
 
-            {/* Category name */}
-            <h1 className="text-white text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight drop-shadow-lg" style={{ fontFamily: 'system-ui, -apple-system, sans-serif', textShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
-              {current.label}
-            </h1>
-
-            {/* Description */}
-            <p className="text-white/80 text-sm sm:text-base mt-2 font-light drop-shadow" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
-              {current.desc}
-            </p>
-
-            {/* Online count */}
+            {/* Online count — small pill */}
             {current.online > 0 && (
-              <div className="mt-3 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10">
-                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                <span className="text-white/80 text-xs">{current.online} online agora</span>
+              <div className="mb-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/10">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                <span className="text-white/70 text-[11px] font-light">{current.online} online</span>
               </div>
             )}
 
-            {/* Enter button */}
-            <div className="mt-6">
+            {/* Glass button — iOS frosted style */}
+            <div className="mt-2">
               <button
                 onClick={handleEnterCategory}
-                className="px-10 py-4 rounded-2xl text-white font-semibold text-base sm:text-lg tracking-wide shadow-2xl active:scale-95 transition-all duration-200"
+                className="px-10 py-3.5 rounded-2xl text-white font-medium text-sm sm:text-base tracking-wide active:scale-95 transition-all duration-200"
                 style={{
-                  background: 'linear-gradient(135deg, #c9a96e 0%, #a0835a 50%, #c9a96e 100%)',
-                  boxShadow: '0 8px 32px rgba(160,130,80,0.4), inset 0 1px 0 rgba(255,255,255,0.2)',
+                  background: 'rgba(255,255,255,0.15)',
+                  backdropFilter: 'blur(20px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                  border: '1px solid rgba(255,255,255,0.25)',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15)',
                 }}
               >
-                {current.key === 'escolha' ? '👉 Explorar Categorias' : current.key === 'friend' ? '👥 Desafiar Amigo' : '⚔️ Entrar na Arena'}
+                {current.key === 'escolha' ? 'Explorar Categorias →' : current.key === 'friend' ? 'Desafiar Amigo' : 'Entrar na Arena'}
               </button>
             </div>
 
             {/* Dot indicators */}
-            <div className="mt-6 flex items-center justify-center gap-2">
+            <div className="mt-5 flex items-center justify-center gap-1.5">
               {allSlides.map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => setCarouselIndex(idx)}
-                  className={`rounded-full transition-all duration-300 ${idx === carouselIndex ? 'w-8 h-2.5 bg-amber-400' : 'w-2.5 h-2.5 bg-white/40 hover:bg-white/60'}`}
+                  className={`rounded-full transition-all duration-300 ${idx === carouselIndex ? 'w-6 h-2 bg-white/80' : 'w-2 h-2 bg-white/30 hover:bg-white/50'}`}
                 />
               ))}
             </div>
