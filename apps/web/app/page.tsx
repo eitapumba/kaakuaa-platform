@@ -535,7 +535,7 @@ const CATEGORIES = [
   { key: 'arts', emoji: '🎨', label: 'Artes', desc: 'Criatividade em desafio', online: 22, img: '/img/categories/artes.jpg' },
   { key: 'rap_battle', emoji: '🎤', label: 'Rap Battle', desc: 'Batalhas de rima', online: 9, img: '/img/categories/rap.jpg' },
   { key: 'culinary', emoji: '🍳', label: 'Culinária', desc: 'Duelos gastronômicos', online: 15, img: '/img/categories/culinaria.jpg' },
-  { key: 'hero_journey', emoji: '🎬', label: 'Jornada do Herói', desc: 'Do roteiro ao curta-metragem', online: 18, img: '/img/categories/jornada-heroi.jpg' },
+  { key: 'hero_journey', emoji: '🎬', label: 'Jornada do Herói', desc: 'Do roteiro ao curta-metragem', online: 18, img: '', video: '/img/categories/jornada-heroi-camera.webm' },
 ]
 
 const STAKES = [
@@ -1210,26 +1210,33 @@ export default function HomePage() {
             {/* Video overlay + CSS title for video slides */}
             {(slide as any).video && (
               <>
-                {/* Large title text — videogame font */}
+                {/* Large title text — Bebas Neue */}
                 <div className="absolute inset-0 flex items-center justify-center z-[2] pointer-events-none">
                   <h2
-                    className="text-[16vw] sm:text-[14vw] md:text-[12vw] font-black tracking-wider leading-none text-center uppercase"
+                    className="text-[20vw] sm:text-[18vw] md:text-[16vw] tracking-[0.15em] leading-none text-center uppercase"
                     style={{
-                      fontFamily: "'Orbitron', sans-serif",
-                      color: 'rgba(0,0,0,0.06)',
-                      textShadow: '0 0 60px rgba(0,0,0,0.04)',
+                      fontFamily: "'Bebas Neue', sans-serif",
+                      color: 'rgba(0,0,0,0.055)',
+                      letterSpacing: '0.12em',
                     }}
                   >
                     {slide.label}
                   </h2>
                 </div>
-                {/* Video with true alpha transparency (WebM VP9) */}
+                {/* Video with true alpha transparency (WebM VP9) — smaller monk */}
                 <video
                   autoPlay
                   loop
                   muted
                   playsInline
-                  className="absolute inset-0 w-full h-full object-contain z-[3]"
+                  className="absolute z-[3]"
+                  style={{
+                    width: '45%',
+                    maxWidth: '500px',
+                    left: '50%',
+                    top: '50%',
+                    transform: 'translate(-50%, -55%)',
+                  }}
                   src={(slide as any).video}
                 />
               </>
