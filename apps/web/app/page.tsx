@@ -529,12 +529,12 @@ function LandingPage() {
    ═══════════════════════════════════════ */
 
 const CATEGORIES = [
-  { key: 'sports', emoji: '🏋️', label: 'Esportes', desc: 'Desafios físicos ao vivo', online: 47, img: '/img/categories/esportes.jpg' },
-  { key: 'esports', emoji: '🎮', label: 'E-Sports', desc: 'Games competitivos', online: 124, img: '/img/categories/online-games.jpg' },
+  { key: 'sports', emoji: '🏋️', label: 'Esportes', desc: 'Desafios físicos ao vivo', online: 47, img: '', video: '/img/categories/esportes-gloves.webm' },
+  { key: 'esports', emoji: '🎮', label: 'E-Sports', desc: 'Games competitivos', online: 124, img: '', video: '/img/categories/esports-controller.webm' },
   { key: 'personal_evolution', emoji: '🧠', label: 'Evolução', desc: 'Crescimento pessoal', online: 33, img: '', video: '/img/categories/evolucao-monk.webm' },
-  { key: 'arts', emoji: '🎨', label: 'Artes', desc: 'Criatividade em desafio', online: 22, img: '/img/categories/artes.jpg' },
-  { key: 'rap_battle', emoji: '🎤', label: 'Rap Battle', desc: 'Batalhas de rima', online: 9, img: '/img/categories/rap.jpg' },
-  { key: 'culinary', emoji: '🍳', label: 'Culinária', desc: 'Duelos gastronômicos', online: 15, img: '/img/categories/culinaria.jpg' },
+  { key: 'arts', emoji: '🎨', label: 'Artes', desc: 'Criatividade em desafio', online: 22, img: '', video: '/img/categories/artes-palette.webm' },
+  { key: 'rap_battle', emoji: '🎤', label: 'Rap Battle', desc: 'Batalhas de rima', online: 9, img: '', video: '/img/categories/rap-mic.webm' },
+  { key: 'culinary', emoji: '🍳', label: 'Culinária', desc: 'Duelos gastronômicos', online: 15, img: '', video: '/img/categories/culinaria-knives.webm' },
   { key: 'hero_journey', emoji: '🎬', label: 'Jornada do Herói', desc: 'Do roteiro ao curta-metragem', online: 18, img: '', video: '/img/categories/jornada-heroi-camera.webm' },
 ]
 
