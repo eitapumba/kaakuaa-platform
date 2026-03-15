@@ -531,7 +531,7 @@ function LandingPage() {
 const CATEGORIES = [
   { key: 'sports', emoji: '🏋️', label: 'Esportes', desc: 'Desafios físicos ao vivo', online: 47, img: '/img/categories/esportes.jpg' },
   { key: 'esports', emoji: '🎮', label: 'E-Sports', desc: 'Games competitivos', online: 124, img: '/img/categories/online-games.jpg' },
-  { key: 'personal_evolution', emoji: '🧠', label: 'Evolução', desc: 'Crescimento pessoal', online: 33, img: '/img/categories/evolucao.jpg' },
+  { key: 'personal_evolution', emoji: '🧠', label: 'Evolução', desc: 'Crescimento pessoal', online: 33, img: '/img/arena-bg.jpg', video: '/img/categories/evolucao-monk.mp4' },
   { key: 'arts', emoji: '🎨', label: 'Artes', desc: 'Criatividade em desafio', online: 22, img: '/img/categories/artes.jpg' },
   { key: 'rap_battle', emoji: '🎤', label: 'Rap Battle', desc: 'Batalhas de rima', online: 9, img: '/img/categories/rap.jpg' },
   { key: 'culinary', emoji: '🍳', label: 'Culinária', desc: 'Duelos gastronômicos', online: 15, img: '/img/categories/culinaria.jpg' },
@@ -1192,13 +1192,45 @@ export default function HomePage() {
         {allSlides.map((slide, idx) => (
           <div
             key={slide.key}
-            className="absolute inset-0 bg-cover bg-center transition-opacity duration-700"
+            className="absolute inset-0 transition-opacity duration-700"
             style={{
-              backgroundImage: `url(${slide.img})`,
               opacity: idx === carouselIndex ? 1 : 0,
               zIndex: idx === carouselIndex ? 1 : 0,
             }}
-          />
+          >
+            {/* Base background image */}
+            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${slide.img})` }} />
+
+            {/* Video overlay + CSS title for video slides */}
+            {(slide as any).video && (
+              <>
+                {/* Large transparent title text */}
+                <div className="absolute inset-0 flex items-center justify-center z-[2] pointer-events-none">
+                  <h2
+                    className="text-[12vw] sm:text-[10vw] md:text-[9vw] font-black tracking-tight leading-none text-center uppercase"
+                    style={{
+                      color: 'transparent',
+                      WebkitTextStroke: '2px rgba(200,220,240,0.5)',
+                      textShadow: '0 0 40px rgba(150,200,255,0.2), 0 0 80px rgba(150,200,255,0.1)',
+                      fontFamily: 'system-ui, -apple-system, sans-serif',
+                    }}
+                  >
+                    {slide.label}
+                  </h2>
+                </div>
+                {/* Video with screen blend to remove black bg */}
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="absolute inset-0 w-full h-full object-contain z-[3]"
+                  style={{ mixBlendMode: 'screen' }}
+                  src={(slide as any).video}
+                />
+              </>
+            )}
+          </div>
         ))}
 
         {/* Subtle dark overlay — just enough for bottom UI */}
