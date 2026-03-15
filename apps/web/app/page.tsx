@@ -531,7 +531,7 @@ function LandingPage() {
 const CATEGORIES = [
   { key: 'sports', emoji: '🏋️', label: 'Esportes', desc: 'Desafios físicos ao vivo', online: 47, img: '/img/categories/esportes.jpg' },
   { key: 'esports', emoji: '🎮', label: 'E-Sports', desc: 'Games competitivos', online: 124, img: '/img/categories/online-games.jpg' },
-  { key: 'personal_evolution', emoji: '🧠', label: 'Evolução', desc: 'Crescimento pessoal', online: 33, img: '/img/arena-bg.jpg', video: '/img/categories/evolucao-monk.mp4' },
+  { key: 'personal_evolution', emoji: '🧠', label: 'Evolução', desc: 'Crescimento pessoal', online: 33, img: '', video: '/img/categories/evolucao-monk.webm' },
   { key: 'arts', emoji: '🎨', label: 'Artes', desc: 'Criatividade em desafio', online: 22, img: '/img/categories/artes.jpg' },
   { key: 'rap_battle', emoji: '🎤', label: 'Rap Battle', desc: 'Batalhas de rima', online: 9, img: '/img/categories/rap.jpg' },
   { key: 'culinary', emoji: '🍳', label: 'Culinária', desc: 'Duelos gastronômicos', online: 15, img: '/img/categories/culinaria.jpg' },
@@ -1163,6 +1163,8 @@ export default function HomePage() {
     const prevSlide = () => setCarouselIndex(i => i === 0 ? allSlides.length - 1 : i - 1)
     const nextSlide = () => setCarouselIndex(i => i === allSlides.length - 1 ? 0 : i + 1)
 
+    const isVideoSlide = !!(current as any).video
+
     const handleEnterCategory = () => {
       if (current.key === 'escolha') {
         nextSlide()
@@ -1198,34 +1200,36 @@ export default function HomePage() {
               zIndex: idx === carouselIndex ? 1 : 0,
             }}
           >
-            {/* Base background image */}
-            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${slide.img})` }} />
+            {/* Base background — white for video slides, image for others */}
+            {(slide as any).video ? (
+              <div className="absolute inset-0 bg-white" />
+            ) : (
+              <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${slide.img})` }} />
+            )}
 
             {/* Video overlay + CSS title for video slides */}
             {(slide as any).video && (
               <>
-                {/* Large transparent title text */}
+                {/* Large title text — videogame font */}
                 <div className="absolute inset-0 flex items-center justify-center z-[2] pointer-events-none">
                   <h2
-                    className="text-[12vw] sm:text-[10vw] md:text-[9vw] font-black tracking-tight leading-none text-center uppercase"
+                    className="text-[16vw] sm:text-[14vw] md:text-[12vw] font-black tracking-wider leading-none text-center uppercase"
                     style={{
-                      color: 'transparent',
-                      WebkitTextStroke: '2px rgba(200,220,240,0.5)',
-                      textShadow: '0 0 40px rgba(150,200,255,0.2), 0 0 80px rgba(150,200,255,0.1)',
-                      fontFamily: 'system-ui, -apple-system, sans-serif',
+                      fontFamily: "'Orbitron', sans-serif",
+                      color: 'rgba(0,0,0,0.06)',
+                      textShadow: '0 0 60px rgba(0,0,0,0.04)',
                     }}
                   >
                     {slide.label}
                   </h2>
                 </div>
-                {/* Video with screen blend to remove black bg */}
+                {/* Video with true alpha transparency (WebM VP9) */}
                 <video
                   autoPlay
                   loop
                   muted
                   playsInline
                   className="absolute inset-0 w-full h-full object-contain z-[3]"
-                  style={{ mixBlendMode: 'screen' }}
                   src={(slide as any).video}
                 />
               </>
@@ -1233,8 +1237,8 @@ export default function HomePage() {
           </div>
         ))}
 
-        {/* Subtle dark overlay — just enough for bottom UI */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10 z-10" />
+        {/* Overlay — adapts to slide type */}
+        <div className={`absolute inset-0 z-10 transition-all duration-700 ${isVideoSlide ? 'bg-transparent' : 'bg-gradient-to-t from-black/60 via-transparent to-black/10'}`} />
 
         {/* Top bar: Logo + user info */}
         <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-5 py-4">
@@ -1248,8 +1252,8 @@ export default function HomePage() {
           {user && (
             <div className="flex items-center gap-3">
               <div className="text-right hidden sm:block">
-                <p className="text-white text-xs font-medium drop-shadow">{user.displayName}</p>
-                <p className="text-white/60 text-[10px]">{user.vitaBalance || 0} VITA</p>
+                <p className={`text-xs font-medium ${isVideoSlide ? 'text-stone-700' : 'text-white drop-shadow'}`}>{user.displayName}</p>
+                <p className={`text-[10px] ${isVideoSlide ? 'text-stone-400' : 'text-white/60'}`}>{user.vitaBalance || 0} VITA</p>
               </div>
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white text-sm font-bold shadow-lg">
                 {user.displayName?.[0] || 'U'}
@@ -1261,7 +1265,7 @@ export default function HomePage() {
         {/* Left Arrow */}
         <button
           onClick={prevSlide}
-          className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-black/40 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-black/60 active:scale-90 transition-all"
+          className={`absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 sm:w-14 sm:h-14 rounded-full backdrop-blur-sm flex items-center justify-center active:scale-90 transition-all ${isVideoSlide ? 'bg-black/5 border border-black/10 text-stone-500 hover:bg-black/10' : 'bg-black/40 border border-white/20 text-white hover:bg-black/60'}`}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
@@ -1269,7 +1273,7 @@ export default function HomePage() {
         {/* Right Arrow */}
         <button
           onClick={nextSlide}
-          className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-black/40 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-black/60 active:scale-90 transition-all"
+          className={`absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 sm:w-14 sm:h-14 rounded-full backdrop-blur-sm flex items-center justify-center active:scale-90 transition-all ${isVideoSlide ? 'bg-black/5 border border-black/10 text-stone-500 hover:bg-black/10' : 'bg-black/40 border border-white/20 text-white hover:bg-black/60'}`}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
         </button>
@@ -1280,23 +1284,31 @@ export default function HomePage() {
 
             {/* Online count — small pill */}
             {current.online > 0 && (
-              <div className="mb-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/10">
+              <div className={`mb-4 inline-flex items-center gap-2 px-3 py-1 rounded-full backdrop-blur-sm ${isVideoSlide ? 'bg-black/5 border border-black/10' : 'bg-white/10 border border-white/10'}`}>
                 <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                <span className="text-white/70 text-[11px] font-light">{current.online} online</span>
+                <span className={`text-[11px] font-light ${isVideoSlide ? 'text-stone-500' : 'text-white/70'}`}>{current.online} online</span>
               </div>
             )}
 
-            {/* Glass button — iOS frosted style */}
+            {/* Glass button — adapts to bg */}
             <div className="mt-2">
               <button
                 onClick={handleEnterCategory}
-                className="px-10 py-3.5 rounded-2xl text-white font-medium text-sm sm:text-base tracking-wide active:scale-95 transition-all duration-200"
-                style={{
+                className={`px-10 py-3.5 rounded-2xl font-medium text-sm sm:text-base tracking-wide active:scale-95 transition-all duration-200`}
+                style={isVideoSlide ? {
+                  background: 'rgba(0,0,0,0.06)',
+                  backdropFilter: 'blur(20px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                  border: '1px solid rgba(0,0,0,0.1)',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+                  color: '#555',
+                } : {
                   background: 'rgba(255,255,255,0.15)',
                   backdropFilter: 'blur(20px) saturate(180%)',
                   WebkitBackdropFilter: 'blur(20px) saturate(180%)',
                   border: '1px solid rgba(255,255,255,0.25)',
                   boxShadow: '0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15)',
+                  color: '#fff',
                 }}
               >
                 {current.key === 'escolha' ? 'Explorar Categorias →' : current.key === 'friend' ? 'Desafiar Amigo' : 'Entrar na Arena'}
@@ -1309,7 +1321,9 @@ export default function HomePage() {
                 <button
                   key={idx}
                   onClick={() => setCarouselIndex(idx)}
-                  className={`rounded-full transition-all duration-300 ${idx === carouselIndex ? 'w-6 h-2 bg-white/80' : 'w-2 h-2 bg-white/30 hover:bg-white/50'}`}
+                  className={`rounded-full transition-all duration-300 ${idx === carouselIndex
+                    ? `w-6 h-2 ${isVideoSlide ? 'bg-stone-400' : 'bg-white/80'}`
+                    : `w-2 h-2 ${isVideoSlide ? 'bg-stone-300 hover:bg-stone-400' : 'bg-white/30 hover:bg-white/50'}`}`}
                 />
               ))}
             </div>
