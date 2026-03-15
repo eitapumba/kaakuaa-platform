@@ -529,13 +529,13 @@ function LandingPage() {
    ═══════════════════════════════════════ */
 
 const CATEGORIES = [
-  { key: 'sports', emoji: '🏋️', label: 'Sports', desc: 'Desafios físicos ao vivo', online: 47, img: '/img/arena-bg.jpg' },
+  { key: 'sports', emoji: '🏋️', label: 'Esportes', desc: 'Desafios físicos ao vivo', online: 47, img: '/img/categories/esportes.jpg' },
   { key: 'esports', emoji: '🎮', label: 'E-Sports', desc: 'Games competitivos', online: 124, img: '/img/categories/online-games.jpg' },
-  { key: 'personal_evolution', emoji: '🧠', label: 'Evolução', desc: 'Crescimento pessoal', online: 33, img: '/img/arena-bg.jpg' },
+  { key: 'personal_evolution', emoji: '🧠', label: 'Evolução', desc: 'Crescimento pessoal', online: 33, img: '/img/categories/evolucao.jpg' },
   { key: 'arts', emoji: '🎨', label: 'Artes', desc: 'Criatividade em desafio', online: 22, img: '/img/categories/artes.jpg' },
   { key: 'rap_battle', emoji: '🎤', label: 'Rap Battle', desc: 'Batalhas de rima', online: 9, img: '/img/categories/rap.jpg' },
   { key: 'culinary', emoji: '🍳', label: 'Culinária', desc: 'Duelos gastronômicos', online: 15, img: '/img/categories/culinaria.jpg' },
-  { key: 'hero_journey', emoji: '🎬', label: 'Jornada do Herói', desc: 'Do roteiro ao curta-metragem', online: 18, img: '/img/arena-bg.jpg' },
+  { key: 'hero_journey', emoji: '🎬', label: 'Jornada do Herói', desc: 'Do roteiro ao curta-metragem', online: 18, img: '/img/categories/jornada-heroi.jpg' },
 ]
 
 const STAKES = [
@@ -1083,10 +1083,10 @@ export default function HomePage() {
   // Keyboard nav for carousel (home phase)
   useEffect(() => {
     if (phase !== 'home') return
-    const allSlides = [...CATEGORIES, { key: 'friend', emoji: '👥', label: 'Desafiar Amigo', desc: '', online: 0, img: '' }]
+    const totalSlides = CATEGORIES.length + 2 // escolha + categories + friend
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') setCarouselIndex(i => i === allSlides.length - 1 ? 0 : i + 1)
-      else if (e.key === 'ArrowLeft') setCarouselIndex(i => i === 0 ? allSlides.length - 1 : i - 1)
+      if (e.key === 'ArrowRight') setCarouselIndex(i => i === totalSlides - 1 ? 0 : i + 1)
+      else if (e.key === 'ArrowLeft') setCarouselIndex(i => i === 0 ? totalSlides - 1 : i - 1)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -1132,7 +1132,7 @@ export default function HomePage() {
       >
         <div className={`flex flex-col items-center transition-all duration-600 ${splashFading ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
           <img
-            src="/img/logo-jungle-games.png"
+            src="/img/logo-jungle-games-transparent.png"
             alt="Jungle Games"
             className="w-64 sm:w-80 md:w-96 h-auto"
             style={{ filter: 'drop-shadow(0 8px 32px rgba(160,130,80,0.15))' }}
@@ -1154,13 +1154,19 @@ export default function HomePage() {
   // PHASE: HOME — Fullscreen carousel
   // ═══════════════════════════════════
   if (phase === 'home') {
-    const allSlides = [...CATEGORIES, { key: 'friend', emoji: '👥', label: 'Desafiar Amigo', desc: 'Escolha uma categoria e desafie um amigo', online: 0, img: '/img/categories/escolha-batalha.jpg' }]
+    const allSlides = [
+      { key: 'escolha', emoji: '⚔️', label: 'Escolha sua Batalha', desc: 'Deslize para escolher a categoria', online: 0, img: '/img/categories/escolha-batalha.jpg' },
+      ...CATEGORIES,
+      { key: 'friend', emoji: '👥', label: 'Desafiar Amigo', desc: 'Escolha uma categoria e desafie um amigo', online: 0, img: '/img/categories/escolha-batalha.jpg' },
+    ]
     const current = allSlides[carouselIndex]
     const prevSlide = () => setCarouselIndex(i => i === 0 ? allSlides.length - 1 : i - 1)
     const nextSlide = () => setCarouselIndex(i => i === allSlides.length - 1 ? 0 : i + 1)
 
     const handleEnterCategory = () => {
-      if (current.key === 'friend') {
+      if (current.key === 'escolha') {
+        nextSlide()
+      } else if (current.key === 'friend') {
         setMatchType('friend')
         setPhase('friend_category')
       } else {
@@ -1201,7 +1207,7 @@ export default function HomePage() {
         {/* Top bar: Logo + user info */}
         <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-5 py-4">
           <img
-            src="/img/logo-jungle-games.png"
+            src="/img/logo-jungle-games-transparent.png"
             alt="Jungle Games"
             className="h-10 w-auto cursor-pointer"
             style={{ filter: 'brightness(0) invert(1) drop-shadow(0 2px 8px rgba(0,0,0,0.5))' }}
@@ -1272,7 +1278,7 @@ export default function HomePage() {
                   boxShadow: '0 8px 32px rgba(160,130,80,0.4), inset 0 1px 0 rgba(255,255,255,0.2)',
                 }}
               >
-                {current.key === 'friend' ? '👥 Desafiar Amigo' : '⚔️ Entrar na Arena'}
+                {current.key === 'escolha' ? '👉 Explorar Categorias' : current.key === 'friend' ? '👥 Desafiar Amigo' : '⚔️ Entrar na Arena'}
               </button>
             </div>
 
